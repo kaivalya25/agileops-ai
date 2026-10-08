@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agileops-ai"
+version = "0.1.0"
+description = "Multi-agent IT incident investigation and Agile delivery platform"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2,<3"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

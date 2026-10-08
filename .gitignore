@@ -34,3 +34,7 @@ logs/
 # Temporary files
 tmp/
 temp/
+# Python packaging build output
+*.egg-info/
+build/
+dist/

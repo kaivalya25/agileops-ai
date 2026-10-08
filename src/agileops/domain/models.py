@@ -93,5 +93,6 @@ ticket = Incident.create_ticket_from_incident(
     priority=TicketPriority.HIGH
 )
 
+
 print(ticket)
 print(ticket.to_dict())
