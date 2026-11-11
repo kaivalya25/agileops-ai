@@ -10,6 +10,7 @@
 body{margin:0}
 header{background:#102b45;color:white;padding:18px max(24px,calc((100vw - 1040px)/2));display:flex;justify-content:space-between;gap:20px}
 header a{color:#baddf7}
+nav{display:flex;gap:16px;flex-wrap:wrap}
 main{max-width:1090px;margin:auto;padding:32px 25px 54px}
 h1{font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-.045em;margin:0 0 12px}
 h2{font-size:1.05rem;margin:0 0 12px}
@@ -21,38 +22,91 @@ p,li,pre{font-size:.92rem;line-height:1.55;margin:0 0 8px}
 pre{background:#eef4f8;border-radius:6px;padding:12px;overflow:auto}
 ol,ul{margin:0;padding-left:22px}
 #status{margin-bottom:20px}
+[hidden]{display:none!important}
+.action{margin-bottom:16px;border-left:4px solid #216da6}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+label{display:block;font-weight:600;font-size:.9rem}
+input{display:block;width:100%;margin-top:5px;border:1px solid #9eb2c3;border-radius:6px;padding:8px;font:inherit}
+button{border:1px solid #165887;border-radius:7px;padding:8px 12px;font:inherit;font-weight:600;cursor:pointer;color:#165887;background:#fff}
+button[value=approve],#retry{color:#fff;background:#165887}
+button:disabled{opacity:.6;cursor:wait}
+#feedback{margin-top:8px;color:#8c2424}
+table{text-align:left;border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:7px;border-bottom:1px solid #dbe5ed}
+@media(max-width:560px){.fields{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header><strong>AgileOps AI</strong><a href="/dashboard">Delivery dashboard</a></header>
+<header><strong>AgileOps AI</strong><nav><a href="/">Report an incident</a><a href="/dashboard">Delivery dashboard</a></nav></header>
 <main>
 <h1>Incident review</h1>
 <p id="status" class="muted" role="status">Loading workflow…</p>
+<section id="action" class="action" hidden>
+  <h2 id="gate-title"></h2>
+  <p id="gate-context"></p>
+  <form id="approval">
+    <div class="fields">
+      <label>Operator <input id="actor" maxlength="100" value="Lab operator" required></label>
+      <label>Reason <input id="reason" maxlength="1000" required></label>
+      <label id="token-label">Local operator token <input id="token" type="password" autocomplete="off" required></label>
+    </div>
+    <button type="submit" value="approve" id="approve">Approve</button>
+    <button type="submit" value="decline">Decline</button>
+  </form>
+  <button type="button" id="retry" hidden>Retry workflow</button>
+  <p id="feedback" role="status"></p>
+</section>
 <div class="grid" id="content" hidden>
   <section><h2>Incident intake</h2><p id="incident"></p><p id="impact" class="muted"></p></section>
   <section><h2>Investigation</h2><p id="hypothesis"></p><p id="evidence" class="muted"></p></section>
   <section><h2>Approval history</h2><ol id="approvals"></ol></section>
   <section><h2>QA result</h2><p id="qa"></p><p id="ticket" class="muted"></p></section>
+  <section id="recovery-section" class="wide" hidden>
+    <h2>Reporting recovery</h2><p id="recovery-status"></p>
+    <table id="report-table" hidden><thead><tr><th scope="col">Region</th><th scope="col">Orders</th><th scope="col">Total (USD)</th></tr></thead><tbody id="report"></tbody></table>
+  </section>
   <section class="wide"><h2>Controlled patch</h2><pre id="patch"></pre></section>
 </div>
 </main>
 <script>
 const byId = id => document.getElementById(id);
-async function json(path) {
-  const response = await fetch(path);
-  if (!response.ok) throw new Error("The workflow could not be loaded.");
-  return response.json();
+const id = encodeURIComponent(location.pathname.split("/")[2]);
+const workflowUrl = "/workflows/" + id;
+const token = byId("token");
+const action = byId("action");
+const form = byId("approval");
+const feedback = byId("feedback");
+let pending = null;
+token.value = sessionStorage.getItem("agileops.operator") ?? "";
+const gates = {
+  priority_and_scope: ["Approve priority and scope", "Review the diagnosis and the proposed ticket priority.", "Diagnosis and scope reviewed."],
+  remediation: ["Approve remediation", "Review the proposed change to the reporting query.", "Controlled repair plan reviewed."],
+  release: ["Approve release", "Review the QA result and patch. Approval runs the repaired query in the lab.", "Patch and independent QA reviewed."]
+};
+async function json(path, options) {
+  const response = await fetch(path, options);
+  const data = await response.json();
+  if (!response.ok) {
+    if (response.status === 403) {
+      byId("token-label").hidden = false;
+      token.required = true;
+    }
+    throw new Error(typeof data.detail === "string" ? data.detail :
+      (data.detail?.error ? "Workflow paused after " + data.detail.error + "." : "The request could not be completed."));
+  }
+  return data;
 }
 async function load() {
   try {
-    const id = encodeURIComponent(location.pathname.split("/")[2]);
-    const [workflow, audit] = await Promise.all([json(`/workflows/${id}`), json(`/workflows/${id}/audit`)]);
+    const [workflow, audit] = await Promise.all([json(workflowUrl), json(workflowUrl + "/audit")]);
+    pending = workflow.pending_approval?.gate ?? null;
     byId("status").textContent = `${workflow.incident_id} · ${workflow.status.replaceAll("_", " ")}`;
     byId("incident").textContent = workflow.requirements?.business_problem ?? "Intake pending";
     byId("impact").textContent = workflow.requirements?.business_impact ?? "";
     byId("hypothesis").textContent = workflow.investigation?.hypothesis?.text ?? "Insufficient evidence";
     byId("evidence").textContent = (workflow.investigation?.evidence ?? [])
       .filter(item => item.id.startsWith("log:")).map(item => item.text).join(" ");
+    byId("approvals").replaceChildren();
     audit.filter(event => event.category === "approval").forEach(event => {
       const item = document.createElement("li");
       item.textContent = `${event.detail.gate.replaceAll("_", " ")} · ${event.detail.approved ? "approved" : "declined"} by ${event.actor}`;
@@ -66,9 +120,90 @@ async function load() {
     byId("qa").textContent = workflow.qa?.output?.trim() ?? "QA pending";
     byId("ticket").textContent = workflow.ticket_id ?? "Ticket pending";
     byId("patch").textContent = workflow.engineering?.patch ?? "Patch pending";
+    const recovery = workflow.reporting_recovery;
+    byId("recovery-section").hidden = !recovery;
+    if (recovery) {
+      byId("recovery-status").textContent = recovery.status === "completed"
+        ? `The approved query loaded ${recovery.rows_loaded} orders. Correlation ID ${recovery.correlation_id}.`
+        : `The refresh failed with ${recovery.event}. Correlation ID ${recovery.correlation_id}.`;
+      byId("report").replaceChildren();
+      byId("report-table").hidden = !recovery.report?.length;
+      for (const region of recovery.report ?? []) {
+        const row = byId("report").insertRow();
+        for (const value of [region.region, region.order_count, (region.total_cents / 100).toFixed(2)]) {
+          row.insertCell().textContent = value;
+        }
+      }
+    }
+    const retry = !pending && (workflow.next?.length || workflow.status === "awaiting_dependencies");
+    action.hidden = !(pending || retry);
+    form.hidden = !pending;
+    byId("retry").hidden = !retry;
+    byId("token-label").hidden = Boolean(token.value);
+    token.required = !token.value;
+    byId("actor").closest("label").hidden = !pending;
+    byId("reason").closest("label").hidden = !pending;
+    for (const button of form.querySelectorAll("button")) button.hidden = !pending;
+    if (pending) {
+      const [title, context, reason] = gates[pending];
+      byId("gate-title").textContent = title;
+      byId("gate-context").textContent = pending === "remediation"
+        ? (workflow.plan?.change ?? context)
+        : pending === "priority_and_scope"
+          ? context + " Priority " + workflow.priority + ". " + (workflow.requirements?.acceptance_criteria ?? []).join(" ")
+          : context;
+      byId("approve").textContent = title;
+      byId("reason").value = reason;
+    } else if (retry) {
+      byId("gate-title").textContent = "Resume investigation";
+      byId("gate-context").textContent = "Retry from the saved workflow checkpoint.";
+      form.hidden = Boolean(token.value);
+    } else if (workflow.status === "manual_review") {
+      byId("qa").textContent = "Diagnosis complete. This scenario needs a manual repair.";
+    }
     byId("content").hidden = false;
   } catch (error) { byId("status").textContent = error.message; }
 }
+async function continueWorkflow(path, payload) {
+  for (const button of action.querySelectorAll("button")) button.disabled = true;
+  feedback.textContent = "Processing the decision…";
+  try {
+    await json(workflowUrl + path, {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "X-AgileOps-Approval-Token": token.value.trim()},
+      body: payload ? JSON.stringify(payload) : undefined
+    });
+    sessionStorage.setItem("agileops.operator", token.value.trim());
+    feedback.textContent = "";
+    await load();
+  } catch (error) {
+    await load();
+    feedback.textContent = error.message;
+    if (error.message === "Approval token is invalid.") {
+      byId("token-label").hidden = false;
+      token.required = true;
+      if (!pending) form.hidden = false;
+    }
+  } finally {
+    for (const button of action.querySelectorAll("button")) button.disabled = false;
+  }
+}
+form.addEventListener("submit", event => {
+  event.preventDefault();
+  if (!pending) return;
+  continueWorkflow("/approve", {
+    gate: pending, approved: event.submitter.value === "approve",
+    actor: byId("actor").value, reason: byId("reason").value
+  });
+});
+byId("retry").addEventListener("click", () => {
+  if (!token.value.trim()) {
+    feedback.textContent = "Enter the local operator token to retry.";
+    token.focus();
+    return;
+  }
+  continueWorkflow("/retry");
+});
 load();
 </script>
 </body>

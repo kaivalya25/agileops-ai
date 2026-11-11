@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgileOps AI | Reporting lab</title>
+<style>
+:root{font-family:Inter,"Segoe UI",sans-serif;color:#182636;background:#f3f6f9}
+*{box-sizing:border-box}
+body{margin:0}
+header{background:#102b45;color:white;padding:18px max(22px,calc((100vw - 1080px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px}
+nav{display:flex;gap:16px}
+header a{color:#baddf7;font-size:.9rem}
+main{max-width:1124px;margin:auto;padding:36px 22px 58px}
+h1{font-size:clamp(1.85rem,4vw,2.75rem);letter-spacing:-.045em;margin:0 0 8px}
+h2{font-size:1.05rem;margin:0 0 12px}
+p,li{line-height:1.55}
+.lede{margin:0 0 24px;color:#53677b}
+.layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(235px,1fr);gap:18px;align-items:start}
+form,aside{background:#fff;border:1px solid #dbe5ed;border-radius:12px;padding:22px}
+aside p,aside li,.hint{font-size:.9rem;color:#53677b}
+aside ol{padding-left:20px}
+aside li+li{margin-top:8px}
+label{display:block;font-weight:600;font-size:.9rem;margin:0 0 5px}
+input:not([type=checkbox]),textarea,select{width:100%;border:1px solid #9eb2c3;border-radius:6px;padding:9px 10px;font:inherit;background:white;color:inherit}
+textarea{resize:vertical;min-height:60px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.wide{grid-column:1/-1}
+.hint{margin:5px 0 0}
+.options{display:flex;align-items:center;gap:7px;margin:16px 0;font-weight:500}
+button{background:#165887;color:white;border:0;border-radius:7px;padding:10px 15px;font:inherit;font-weight:600;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+#feedback{margin:10px 0 0;color:#8c2424;font-size:.92rem}
+a{color:#165887}
+@media(max-width:690px){.layout{grid-template-columns:1fr}main{padding-top:25px}}
+@media(max-width:430px){.fields{grid-template-columns:1fr}nav{gap:9px}}
+</style>
+</head>
+<body>
+<header><strong>AgileOps AI</strong><nav><a href="/dashboard">Dashboard</a><a href="/docs">API docs</a></nav></header>
+<main>
+  <h1>Report an incident</h1>
+  <p class="lede">Submit an incident to the reporting lab and follow it through investigation and review.</p>
+  <div class="layout">
+    <form id="intake">
+      <div class="fields">
+        <div class="wide">
+          <label for="summary">What happened?</label>
+          <textarea id="summary" name="summary" minlength="10" maxlength="200" required>Sales dashboard refresh failed after a reporting schema change.</textarea>
+        </div>
+        <div>
+          <label for="reporter">Reported by</label>
+          <input id="reporter" name="reported_by" minlength="2" maxlength="50" value="Reporting operations" required>
+        </div>
+        <div>
+          <label for="system">Affected system</label>
+          <input id="system" name="affected_system" value="Sales dashboard">
+        </div>
+        <div class="wide">
+          <label for="impact">Business impact</label>
+          <textarea id="impact" name="business_impact" minlength="10" maxlength="100" required>Executive regional sales totals are stale.</textarea>
+        </div>
+        <div>
+          <label for="scenario">Lab failure</label>
+          <select id="scenario" name="scenario">
+            <option value="missing_column">Missing report column</option>
+            <option value="schema_mismatch">Source schema mismatch</option>
+            <option value="bad_sql">SQL syntax error</option>
+            <option value="invalid_config">Invalid connector configuration</option>
+            <option value="duplicate_data">Duplicate orders</option>
+          </select>
+        </div>
+        <div>
+          <label for="priority">Ticket priority</label>
+          <select id="priority" name="priority">
+            <option value="low">Low</option><option value="medium">Medium</option>
+            <option value="high" selected>High</option><option value="critical">Critical</option>
+          </select>
+        </div>
+        <div class="wide">
+          <label for="token">Local operator token</label>
+          <input id="token" type="password" autocomplete="off" required>
+          <p class="hint">Use the token from the launcher’s operator-token file.</p>
+        </div>
+      </div>
+      <label class="options"><input type="checkbox" id="use-model"> Use configured Ollama for analysis</label>
+      <button type="submit" id="submit">Start investigation</button>
+      <p id="feedback" role="status" aria-live="polite"></p>
+    </form>
+    <aside>
+      <h2>Reporting lab</h2>
+      <p id="scenario-help">The missing-column scenario supports the full repair and recovery workflow.</p>
+      <ol>
+        <li>Review the diagnosis and approve the scope.</li>
+        <li>Approve the proposed fix, then review independent QA.</li>
+        <li>Approve the release and inspect the restored report.</li>
+      </ol>
+      <p><a id="last-workflow" hidden>Resume your last workflow</a></p>
+    </aside>
+  </div>
+</main>
+<script>
+const form = document.getElementById("intake");
+const tokenInput = document.getElementById("token");
+const submit = document.getElementById("submit");
+const feedback = document.getElementById("feedback");
+const supplied = new URLSearchParams(location.hash.slice(1)).get("operator");
+if (supplied) {
+  sessionStorage.setItem("agileops.operator", supplied);
+  history.replaceState(null, "", location.pathname + location.search);
+}
+tokenInput.value = sessionStorage.getItem("agileops.operator") ?? "";
+function review(id) {
+  return "/workflows/" + encodeURIComponent(id) + "/review";
+}
+const last = localStorage.getItem("agileops.lastWorkflow");
+if (last) {
+  const link = document.getElementById("last-workflow");
+  link.href = review(last);
+  link.hidden = false;
+}
+document.getElementById("scenario").addEventListener("change", (event) => {
+  document.getElementById("scenario-help").textContent = event.target.value === "missing_column"
+    ? "The missing-column scenario supports the full repair and recovery workflow."
+    : "This scenario supports diagnosis and handoff to manual review.";
+});
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  submit.disabled = true;
+  feedback.textContent = "Running the reporting lab and collecting evidence…";
+  const token = tokenInput.value.trim();
+  const payload = Object.fromEntries(new FormData(form));
+  payload.use_model = document.getElementById("use-model").checked;
+  try {
+    const response = await fetch("/lab/incidents", {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "X-AgileOps-Approval-Token": token},
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    const id = data.workflow?.workflow_id ?? data.detail?.workflow_id;
+    if (!id) {
+      throw new Error(typeof data.detail === "string" ? data.detail :
+        (Array.isArray(data.detail) ? data.detail.map(item => item.msg).join(" ") :
+          "The investigation could not start."));
+    }
+    sessionStorage.setItem("agileops.operator", token);
+    localStorage.setItem("agileops.lastWorkflow", id);
+    location.assign(review(id));
+  } catch (error) {
+    feedback.textContent = error.message;
+    submit.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

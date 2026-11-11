@@ -17,6 +17,7 @@ from agileops.analytics import (
 from agileops.grounding import Evidence, GroundedAnswer, answer
 from agileops.investigation import DiagnosticTools, InvestigationReport, investigate
 from agileops.knowledge import KnowledgeBase, Reranker, SearchFilters
+from agileops.lab_intake import LabIncidentCreate, submit_lab_incident
 from agileops.local_model import ModelError, OllamaModel
 from agileops.workflow import (
     Approval,
@@ -29,6 +30,7 @@ from agileops.workflow import (
 router = APIRouter(tags=["automation"])
 DASHBOARD = Path(__file__).parents[2] / "assets" / "dashboard.html"
 REVIEW = DASHBOARD.with_name("workflow.html")
+INTAKE = DASHBOARD.with_name("intake.html")
 ApprovalToken = Annotated[str | None, Header(alias="X-AgileOps-Approval-Token")]
 
 
@@ -132,6 +134,15 @@ def start_workflow(payload: WorkflowStart, request: Request) -> dict:
     return _found(
         _available(lambda: request.app.state.workflow.start(payload)), "Incident"
     )
+
+
+@router.post("/lab/incidents", status_code=201)
+def submit_reporting_incident(
+    payload: LabIncidentCreate, request: Request, token: ApprovalToken = None
+) -> dict:
+    """Record a synthetic reporting failure and start its incident workflow."""
+    _approval_authorized(token)
+    return _available(lambda: submit_lab_incident(request.app.state.workflow, payload))
 
 
 @router.get("/workflows/{workflow_id}")
@@ -247,6 +258,11 @@ def ask_bi(question: Question, request: Request) -> dict:
 @router.get("/dashboard", include_in_schema=False)
 def dashboard() -> FileResponse:
     return FileResponse(DASHBOARD, media_type="text/html")
+
+
+@router.get("/", include_in_schema=False)
+def incident_intake() -> FileResponse:
+    return FileResponse(INTAKE, media_type="text/html")
 
 
 @router.get("/workflows/{workflow_id}/review", include_in_schema=False)

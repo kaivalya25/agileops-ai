@@ -20,6 +20,10 @@ dev = [
     "ruff",
     "pip-audit"
 ]
+lab = [
+    "langgraph>=1,<2",
+    "langgraph-checkpoint-sqlite>=3,<4"
+]
 ai = [
     "faiss-cpu>=1.10,<2",
     "sentence-transformers>=4,<6",
@@ -32,3 +36,6 @@ agileops = ["runbooks/*.md", "assets/*.html"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

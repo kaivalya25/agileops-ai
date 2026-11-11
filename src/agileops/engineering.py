@@ -10,13 +10,14 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from agileops.agents import EngineeringHandoff
+from agileops.lab import REPORT_SQL
 
 FILE = "report_query.py"
 KNOWN_BUG = "gross_cents"
 CORRECT_COLUMN = "amount_cents"
 TEST_FILE = "check_report.py"
 REGRESSION_FILE = "test_regression.py"
-BASE_SOURCE = 'REPORT_SQL = "SELECT region, COUNT(*), SUM(gross_cents) FROM reporting_orders GROUP BY region"\n'
+BASE_SOURCE = f'REPORT_SQL = "{REPORT_SQL.replace(CORRECT_COLUMN, KNOWN_BUG)}"\n'
 TEST_SOURCE = """from pathlib import Path
 import runpy
 import sqlite3
@@ -251,3 +252,15 @@ def validate_patch(root: Path, workflow_id: str) -> ValidationResult:
         checks=["scope", "static", "reconciliation"],
         output=(result.stdout + result.stderr)[-2500:],
     )
+
+
+def approved_report_query(root: Path, workflow_id: str) -> str:
+    """Read the approved SQL literal without executing the worktree's Python."""
+    file = _workspace(root, workflow_id) / FILE
+    expected = BASE_SOURCE.replace(KNOWN_BUG, CORRECT_COLUMN)
+    if file.is_symlink():
+        raise ValueError("The approved reporting query has changed.")
+    source = file.read_text(encoding="utf-8")
+    if source != expected:
+        raise ValueError("The approved reporting query has changed.")
+    return ast.literal_eval(ast.parse(source).body[0].value)

@@ -20,25 +20,36 @@ class SQLiteSprintRepository:
     def __init__(self, database_path: Path) -> None:
         self.database_path = database_path
 
+    def create_if_empty(self, build_sprint: Callable[[str], Sprint]) -> None:
+        with write_transaction(self.database_path) as connection:
+            if connection.execute("SELECT 1 FROM sprints LIMIT 1").fetchone() is None:
+                self._create(connection, build_sprint)
+
     def create(self, build_sprint: Callable[[str], Sprint]) -> Sprint:
         with write_transaction(self.database_path) as connection:
-            number = connection.execute(
-                "SELECT COALESCE(MAX(number), 0) + 1 FROM sprints"
-            ).fetchone()[0]
-            sprint = build_sprint(f"SPRINT-{number:03d}")
-            connection.execute(
-                """
-                INSERT INTO sprints (number, sprint_id, name, planned_start_date, planned_end_date)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                (
-                    number,
-                    sprint.sprint_id,
-                    sprint.name,
-                    sprint.planned_start_date.isoformat(),
-                    sprint.planned_end_date.isoformat(),
-                ),
-            )
+            return self._create(connection, build_sprint)
+
+    @staticmethod
+    def _create(
+        connection: sqlite3.Connection, build_sprint: Callable[[str], Sprint]
+    ) -> Sprint:
+        number = connection.execute(
+            "SELECT COALESCE(MAX(number), 0) + 1 FROM sprints"
+        ).fetchone()[0]
+        sprint = build_sprint(f"SPRINT-{number:03d}")
+        connection.execute(
+            """
+            INSERT INTO sprints (number, sprint_id, name, planned_start_date, planned_end_date)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                number,
+                sprint.sprint_id,
+                sprint.name,
+                sprint.planned_start_date.isoformat(),
+                sprint.planned_end_date.isoformat(),
+            ),
+        )
         return sprint
 
     def get_by_id(self, sprint_id: str) -> Sprint | None:

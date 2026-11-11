@@ -113,6 +113,7 @@ def test_workflow_requires_each_approval_and_resumes_after_restart(tmp_path):
         runtime = WorkflowRuntime(
             Path(demo["database"]), Path(demo["workflow_directory"])
         )
+        runtime.lab_path = Path(demo["reporting_database"])
         assert runtime.get(workflow_id)["pending_approval"]["gate"] == gate
         state = runtime.resume(
             workflow_id,
@@ -129,6 +130,7 @@ def test_workflow_requires_each_approval_and_resumes_after_restart(tmp_path):
             assert state["status"] == "completed"
     assert state["qa"]["passed"]
     assert state["analytics"]["throughput"] == 1
+    assert state["reporting_recovery"]["rows_loaded"] == 3
     assert "+REPORT_SQL" in state["engineering"]["patch"]
     assert [
         event["detail"]["gate"]

@@ -9,6 +9,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
+operator-token.txt
 
 # Testing
 .pytest_cache/

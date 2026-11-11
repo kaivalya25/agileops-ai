@@ -18,6 +18,7 @@ from agileops.domain.enums import TicketPriority, TicketStatus
 from agileops.engineering import (
     EngineeringPlan,
     apply_patch,
+    approved_report_query,
     prepare_repository,
     propose_patch,
     review_patch,
@@ -25,6 +26,7 @@ from agileops.engineering import (
 )
 from agileops.investigation import DiagnosticTools, investigate
 from agileops.knowledge import KnowledgeBase
+from agileops.lab import run_refresh
 from agileops.local_model import OllamaModel
 from agileops.repositories.sqlite_sprint_repository import SQLiteSprintRepository
 from agileops.repositories.sqlite_ticket_repository import SQLiteTicketRepository
@@ -36,7 +38,7 @@ TOOL_PERMISSIONS = {
     "scrum_master": {"plan_sprint"},
     "engineer": {"inspect_repository", "apply_reporting_patch"},
     "security": {"review_patch"},
-    "qa": {"validate_reporting_patch"},
+    "qa": {"validate_reporting_patch", "verify_reporting_recovery"},
     "bi": {"read_portfolio"},
 }
 MAX_TOOL_CALLS = 24
@@ -112,6 +114,8 @@ class State(TypedDict, total=False):
     attempts: int
     analytics: dict
     unresolved_dependencies: list[str]
+    verify_reporting_recovery: bool
+    reporting_recovery: dict
 
 
 class WorkflowRuntime:
@@ -447,6 +451,24 @@ class WorkflowRuntime:
             )
             if not result["passed"]:
                 return {"qa": result, "status": "qa_failed"}
+            recovery = {}
+            if state.get("verify_reporting_recovery"):
+                refresh = self._tool(
+                    state,
+                    "qa",
+                    "verify_reporting_recovery",
+                    lambda: run_refresh(
+                        self.lab_path,
+                        incident_id=state["incident_id"],
+                        report_sql=approved_report_query(
+                            self.root, state["workflow_id"]
+                        ),
+                    ),
+                    incident_id=state["incident_id"],
+                )
+                recovery["reporting_recovery"] = refresh
+                if refresh["status"] != "completed":
+                    return {**recovery, "status": "recovery_failed"}
             self._transition(
                 state,
                 TicketStatus.DONE,
@@ -455,7 +477,7 @@ class WorkflowRuntime:
             analytics = self._tool(
                 state, "bi", "read_portfolio", lambda: portfolio(self.database_path)
             )
-            return {"analytics": analytics, "status": "completed"}
+            return {**recovery, "analytics": analytics, "status": "completed"}
 
         graph.add_node("business_analyst", analyze)
         graph.add_node("investigator", investigate_incident)
@@ -536,7 +558,9 @@ class WorkflowRuntime:
             "next": list(state.next),
         }
 
-    def start(self, request: WorkflowStart) -> dict | None:
+    def start(
+        self, request: WorkflowStart, *, verify_reporting_recovery: bool = False
+    ) -> dict | None:
         from langgraph.checkpoint.sqlite import SqliteSaver
 
         if self._tools().get_incident(request.incident_id) is None:
@@ -554,7 +578,11 @@ class WorkflowRuntime:
             )
             self._invoke(
                 graph,
-                {**request.model_dump(mode="json"), "workflow_id": workflow_id},
+                {
+                    **request.model_dump(mode="json"),
+                    "workflow_id": workflow_id,
+                    "verify_reporting_recovery": verify_reporting_recovery,
+                },
                 config,
             )
             return self._snapshot(graph, config)

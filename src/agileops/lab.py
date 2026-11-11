@@ -17,6 +17,9 @@ SO-1001,Central,120.00
 SO-1002,East,55.25
 SO-1003,Central,79.95
 """
+REPORT_SQL = (
+    "SELECT region, COUNT(*), SUM(amount_cents) FROM reporting_orders GROUP BY region"
+)
 SCENARIOS = {
     "schema_mismatch": "SOURCE_SCHEMA_MISMATCH",
     "bad_sql": "SQL_SYNTAX_ERROR",
@@ -72,7 +75,11 @@ def _extract(source: str) -> list[tuple[str, str, int]]:
 
 
 def _refresh(
-    connection: sqlite3.Connection, scenario: str, source: str, token: str
+    connection: sqlite3.Connection,
+    scenario: str,
+    source: str,
+    token: str,
+    summary_sql: str,
 ) -> int:
     if scenario == "invalid_config" or token != "demo-read-only":
         raise RefreshError(
@@ -90,7 +97,6 @@ def _refresh(
     except sqlite3.IntegrityError as error:
         raise RefreshError("DUPLICATE_ORDER_ID", str(error)) from error
 
-    summary_sql = "SELECT region, COUNT(*), SUM(amount_cents) FROM reporting_orders GROUP BY region"
     if scenario == "bad_sql":
         summary_sql += " WHERE"
     if scenario == "missing_column":
@@ -112,6 +118,7 @@ def run_refresh(
     incident_id: str | None = None,
     source: str = SOURCE,
     token: str = "demo-read-only",
+    report_sql: str | None = None,
 ) -> dict:
     if scenario not in {"healthy", *SCENARIOS}:
         raise ValueError(f"Unknown reporting scenario {scenario!r}.")
@@ -136,10 +143,17 @@ def run_refresh(
                 ),
             )
 
-        record("INFO", "REFRESH_STARTED", f"Starting reporting refresh ({scenario}).")
+        mode = scenario if report_sql is None else "approved worktree query"
+        record("INFO", "REFRESH_STARTED", f"Starting reporting refresh ({mode}).")
         connection.execute("SAVEPOINT refresh")
         try:
-            count = _refresh(connection, scenario, source, token)
+            count = _refresh(
+                connection,
+                scenario,
+                source,
+                token,
+                REPORT_SQL if report_sql is None else report_sql,
+            )
         except RefreshError as error:
             connection.execute("ROLLBACK TO SAVEPOINT refresh")
             record("ERROR", error.code, str(error))
@@ -147,20 +161,31 @@ def run_refresh(
         else:
             record("INFO", "REFRESH_COMPLETED", f"Loaded {count} orders.")
             result = {"status": "completed", "rows_loaded": count}
+            if report_sql is not None:
+                result["report"] = _report_rows(connection)
         connection.execute("RELEASE SAVEPOINT refresh")
     return {"correlation_id": correlation_id, **result}
+
+
+def _report_rows(connection: sqlite3.Connection) -> list[dict]:
+    return [
+        dict(row)
+        for row in connection.execute("SELECT * FROM reporting_summary ORDER BY region")
+    ]
 
 
 def read_report(path: Path) -> list[dict]:
     if not path.is_file():
         return []
     with connect(path) as connection:
-        return [
-            dict(row)
-            for row in connection.execute(
-                "SELECT * FROM reporting_summary ORDER BY region"
-            )
-        ]
+        if (
+            connection.execute(
+                "SELECT 1 FROM sqlite_schema WHERE name = 'reporting_summary'"
+            ).fetchone()
+            is None
+        ):
+            return []
+        return _report_rows(connection)
 
 
 def query_logs(
