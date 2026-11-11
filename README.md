@@ -296,3 +296,41 @@ Current work includes:
 
 AI agents, RAG pipelines, orchestration, databases, automated testing, and production workflows will be implemented incrementally throughout the project.
 
+## Ticket API
+
+Install the project and test dependencies, then start the API from the repository root.
+
+```powershell
+python -m pip install -e ".[dev]"
+python -m uvicorn agileops.main:app
+```
+
+The app applies pending SQLite migrations at startup. It stores tickets and events in `agileops.db` in the working directory by default. Set `AGILEOPS_DB_PATH` to use a different database file in an existing directory.
+
+| Method and path | Behavior |
+| --- | --- |
+| `GET /health` | Check that the application started. |
+| `POST /tickets` | Create a ticket in `NEW` and return it with HTTP 201. |
+| `GET /tickets` | List tickets in creation order. |
+| `GET /tickets/{ticket_id}` | Retrieve a ticket by its public ID, such as `TASK-001`. |
+| `PATCH /tickets/{ticket_id}/status` | Apply a transition using a body such as `{"status": "investigating"}`. |
+| `GET /tickets/{ticket_id}/events` | List creation and accepted status changes in write order, with UTC timestamps. |
+
+Requests use lowercase enum values. Ticket responses use uppercase enum names. Invalid request bodies return HTTP 422, missing tickets return HTTP 404, and invalid status transitions return HTTP 409. See `/docs` for the request and response schemas.
+
+Run `python -m pytest` to verify the API, workflow, and persistence. The [Day 4 audit and Day 5 plan](docs/day-5-plan.md) records the original gaps and implementation sequence.
+
+## Incident API
+
+| Method and path | Behavior |
+| --- | --- |
+| `POST /incidents` | Record an incident with a summary, reporter, business impact, and optional affected system. |
+| `GET /incidents` | List incidents by year and number. |
+| `GET /incidents/{incident_id}` | Retrieve an incident by its public ID. |
+| `POST /incidents/{incident_id}/tickets` | Create a linked ticket from the incident with a body such as `{"priority": "high"}`. |
+| `GET /incidents/{incident_id}/tickets` | List tickets linked to that incident in ticket creation order. |
+
+Incident IDs use the format `INC YY-NNNN`. The sequence starts at `0001` each UTC year. In URLs, encode the space as `%20`, as in `/incidents/INC%2026-0001`.
+
+Linked tickets use the same ID sequence, workflow, and event history as other tickets. Their relationship is available through the incident's ticket routes. On startup, the Day 6 migration upgrades existing Day 5 databases and preserves their tickets, events, and ticket number sequence.
+

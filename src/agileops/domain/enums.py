@@ -20,3 +20,8 @@ class TicketType(str, Enum):
     INCIDENT = "incident"
     TECHNICAL = "technical"
     OTHER = "other"
+
+
+class TicketEventType(str, Enum):
+    CREATED = "created"
+    STATUS_CHANGED = "status_changed"

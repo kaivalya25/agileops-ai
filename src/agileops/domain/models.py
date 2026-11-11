@@ -1,5 +1,8 @@
 from dataclasses import dataclass
+from datetime import datetime
+
 from agileops.domain.enums import(
+    TicketEventType,
     TicketPriority,
     TicketStatus,
     TicketType
@@ -35,6 +38,7 @@ class Ticket:
     created_by: str
     assigned_to: str|None = None
     status: TicketStatus = TicketStatus.NEW
+    incident_id: str | None = None
 
     def change_status(self, new_status: TicketStatus) -> None:
         if new_status not in ALLOWED_STATUS_TRANSITIONS[self.status]:
@@ -55,6 +59,18 @@ class Ticket:
             "assigned_to": self.assigned_to,
             "status": self.status.name,
         }
+
+
+@dataclass(frozen=True)
+class TicketEvent:
+    event_id: int
+    ticket_id: str
+    event_type: TicketEventType
+    previous_status: TicketStatus | None
+    new_status: TicketStatus
+    occurred_at: datetime
+
+
 @dataclass
 class Incident:
     incident_id: str
@@ -77,22 +93,5 @@ class Incident:
             priority=priority,
             business_impact=incident.business_impact,
             created_by=incident.reported_by,
+            incident_id=incident.incident_id,
         )
-
-incident = Incident(
-    incident_id = "INC 26-0002",
-    summary="Sales dashboard refresh failed.",
-    reported_by="Sales Manager",
-    business_impact="High",
-    affected_system= None
-)
-
-ticket = Incident.create_ticket_from_incident(
-    incident=incident,
-    ticket_id="TASK 26-0002",
-    priority=TicketPriority.HIGH
-)
-
-
-print(ticket)
-print(ticket.to_dict())

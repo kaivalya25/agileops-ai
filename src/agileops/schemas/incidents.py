@@ -1,4 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from agileops.domain.enums import TicketPriority
+from agileops.domain.models import Incident
+
 
 class IncidentCreate(BaseModel):
     summary: str = Field(
@@ -17,4 +21,27 @@ class IncidentCreate(BaseModel):
     )
 
     affected_system: str|None = None
+
+    def to_domain(self, incident_id: str) -> Incident:
+        return Incident(
+            incident_id=incident_id,
+            summary=self.summary,
+            reported_by=self.reported_by,
+            business_impact=self.business_impact,
+            affected_system=self.affected_system,
+        )
+
+
+class IncidentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    incident_id: str
+    summary: str
+    reported_by: str
+    business_impact: str
+    affected_system: str | None
+
+
+class IncidentTicketCreate(BaseModel):
+    priority: TicketPriority
 

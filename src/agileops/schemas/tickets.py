@@ -1,9 +1,15 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
-from agileops.domain.models import Ticket
+
 from agileops.domain.enums import (
+    TicketEventType,
     TicketPriority,
+    TicketStatus,
     TicketType,
 )
+from agileops.domain.models import Ticket, TicketEvent
+
 
 class TicketCreate(BaseModel):
     title: str = Field(
@@ -44,13 +50,41 @@ class TicketCreate(BaseModel):
             assigned_to=self.assigned_to,
         )
 
-# status is not created as anyone can pass status = "done"
-ticket_request = TicketCreate(
-    title="Repair dashboard refresh",
-    description="Investigate and repair the dashboard refresh failure.",
-    ticket_type="incident",
-    priority="high",
-    business_impact="Executive reporting is unavailable.",
-    created_by="Finance Executive",
-)
-print(ticket_request.model_dump_json(indent=2))
+class TicketResponse(BaseModel):
+    ticket_id: str
+    title: str
+    description: str
+    ticket_type: str
+    priority: str
+    business_impact: str
+    created_by: str
+    assigned_to: str | None
+    status: str
+
+    @classmethod
+    def from_domain(cls, ticket: Ticket) -> "TicketResponse":
+        return cls.model_validate(ticket.to_dict())
+
+
+class TicketStatusUpdate(BaseModel):
+    status: TicketStatus
+
+
+class TicketEventResponse(BaseModel):
+    event_id: int
+    ticket_id: str
+    event_type: TicketEventType
+    previous_status: str | None
+    new_status: str
+    occurred_at: datetime
+
+    @classmethod
+    def from_domain(cls, event: TicketEvent) -> "TicketEventResponse":
+        return cls(
+            event_id=event.event_id,
+            ticket_id=event.ticket_id,
+            event_type=event.event_type,
+            previous_status=event.previous_status.name if event.previous_status is not None else None,
+            new_status=event.new_status.name,
+            occurred_at=event.occurred_at,
+        )
