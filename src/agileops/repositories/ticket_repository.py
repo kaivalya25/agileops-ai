@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import date
 from typing import Protocol
 
 from agileops.domain.enums import TicketStatus
@@ -28,4 +29,8 @@ class TicketRepository(Protocol):
 
     def list_events(self, ticket_id: str) -> list[TicketEvent] | None:
         """Return history in write order, or None if the ticket does not exist."""
+        ...
+
+    def count_completions(self, start_date: date, end_date: date) -> int:
+        """Count completed tickets from start_date through the day before end_date in UTC."""
         ...

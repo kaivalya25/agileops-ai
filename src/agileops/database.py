@@ -62,6 +62,12 @@ MIGRATIONS = (
         "ALTER TABLE tickets ADD COLUMN incident_id TEXT REFERENCES incidents (incident_id)",
         "CREATE INDEX tickets_by_incident ON tickets (incident_id, number)",
     ),
+    (
+        """
+        CREATE INDEX ticket_completions_by_time ON ticket_events (occurred_at)
+        WHERE event_type = 'status_changed' AND new_status = 'done'
+        """,
+    ),
 )
 
 

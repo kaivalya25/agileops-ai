@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date, datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from agileops.domain.enums import (
     TicketEventType,
@@ -88,3 +88,19 @@ class TicketEventResponse(BaseModel):
             new_status=event.new_status.name,
             occurred_at=event.occurred_at,
         )
+
+
+class TicketMetricsResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    ticket_id: str
+    lead_time_seconds: float | None
+    cycle_time_seconds: float | None
+    qa_turnaround_seconds: float
+    qa_return_count: int
+
+
+class TicketThroughputResponse(BaseModel):
+    start_date: date
+    end_date: date
+    completed_tickets: int

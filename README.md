@@ -334,3 +334,14 @@ Incident IDs use the format `INC YY-NNNN`. The sequence starts at `0001` each UT
 
 Linked tickets use the same ID sequence, workflow, and event history as other tickets. Their relationship is available through the incident's ticket routes. On startup, the Day 6 migration upgrades existing Day 5 databases and preserves their tickets, events, and ticket number sequence.
 
+## Ticket metrics
+
+Day 7 adds two read endpoints that use the existing ticket event history. Metrics include standalone and incident-linked tickets.
+
+| Method and path | Behavior |
+| --- | --- |
+| `GET /tickets/{ticket_id}/metrics` | Return the ticket's lead time, cycle time, completed QA time, and number of returns from QA to development. |
+| `GET /tickets/metrics/throughput?start_date=2026-11-01&end_date=2026-11-02` | Count tickets that reached `DONE` on or after the start date and before the end date, using UTC dates. |
+
+Lead time runs from creation to `DONE`. Cycle time runs from the first `IN_PROGRESS` event to `DONE`, including time spent in QA and rework. Both are reported in seconds and are `null` until completion. QA turnaround sums the seconds across all completed QA visits. A visit is complete when the ticket leaves `QA` for either `IN_PROGRESS` or `DONE`.
+

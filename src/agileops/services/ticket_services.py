@@ -1,5 +1,8 @@
+from datetime import date
+
 from agileops.domain.enums import TicketStatus
 from agileops.domain.models import Ticket, TicketEvent
+from agileops.domain.ticket_metrics import TicketMetrics, calculate_ticket_metrics
 from agileops.repositories.ticket_repository import TicketRepository
 from agileops.schemas.tickets import TicketCreate
 
@@ -22,3 +25,12 @@ class TicketService:
 
     def list_ticket_events(self, ticket_id: str) -> list[TicketEvent] | None:
         return self.repository.list_events(ticket_id)
+
+    def get_ticket_metrics(self, ticket_id: str) -> TicketMetrics | None:
+        events = self.repository.list_events(ticket_id)
+        if events is None:
+            return None
+        return calculate_ticket_metrics(ticket_id, events)
+
+    def count_completed_tickets(self, start_date: date, end_date: date) -> int:
+        return self.repository.count_completions(start_date, end_date)

@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -6,8 +7,10 @@ from agileops.domain.exceptions import InvalidStatusTransitionError
 from agileops.schemas.tickets import (
     TicketCreate,
     TicketEventResponse,
+    TicketMetricsResponse,
     TicketResponse,
     TicketStatusUpdate,
+    TicketThroughputResponse,
 )
 from agileops.services.ticket_services import TicketService
 
@@ -34,6 +37,22 @@ def create_ticket(ticket_data: TicketCreate, service: TicketServiceDependency) -
 @router.get("")
 def list_tickets(service: TicketServiceDependency) -> list[TicketResponse]:
     return [TicketResponse.from_domain(ticket) for ticket in service.list_tickets()]
+
+
+@router.get("/metrics/throughput")
+def get_ticket_throughput(
+    start_date: date, end_date: date, service: TicketServiceDependency
+) -> TicketThroughputResponse:
+    if start_date >= end_date:
+        raise HTTPException(
+            status_code=422,
+            detail="start_date must be before end_date.",
+        )
+    return TicketThroughputResponse(
+        start_date=start_date,
+        end_date=end_date,
+        completed_tickets=service.count_completed_tickets(start_date, end_date),
+    )
 
 
 @router.get("/{ticket_id}")
@@ -65,3 +84,11 @@ def list_ticket_events(
     if events is None:
         raise _ticket_not_found(ticket_id)
     return [TicketEventResponse.from_domain(event) for event in events]
+
+
+@router.get("/{ticket_id}/metrics")
+def get_ticket_metrics(ticket_id: str, service: TicketServiceDependency) -> TicketMetricsResponse:
+    metrics = service.get_ticket_metrics(ticket_id)
+    if metrics is None:
+        raise _ticket_not_found(ticket_id)
+    return TicketMetricsResponse.model_validate(metrics)

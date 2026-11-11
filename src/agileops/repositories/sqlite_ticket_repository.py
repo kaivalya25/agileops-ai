@@ -1,6 +1,6 @@
 import sqlite3
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from agileops.database import connect, write_transaction
@@ -153,3 +153,15 @@ class SQLiteTicketRepository:
             if not rows:
                 return None
             return [_to_event(row) for row in rows if row["event_id"] is not None]
+
+    def count_completions(self, start_date: date, end_date: date) -> int:
+        # Stored event timestamps start with their ISO-formatted UTC date.
+        with connect(self.database_path) as connection:
+            return connection.execute(
+                """
+                SELECT COUNT(*) FROM ticket_events
+                WHERE event_type = 'status_changed' AND new_status = 'done'
+                  AND occurred_at >= ? AND occurred_at < ?
+                """,
+                (start_date.isoformat(), end_date.isoformat()),
+            ).fetchone()[0]
