@@ -44,7 +44,10 @@ def test_ticket_repository_rejects_missing_incident_link(tmp_path):
 
     with pytest.raises(sqlite3.IntegrityError, match="FOREIGN KEY constraint failed"):
         tickets.create(
-            partial(missing_incident.create_ticket_from_incident, priority=TicketPriority.HIGH)
+            partial(
+                missing_incident.create_ticket_from_incident,
+                priority=TicketPriority.HIGH,
+            )
         )
     assert tickets.list_all() == []
     assert tickets.list_events("TASK-001") is None

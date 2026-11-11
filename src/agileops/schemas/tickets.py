@@ -14,13 +14,13 @@ from agileops.domain.models import Ticket, TicketEvent
 
 class TicketCreate(BaseModel):
     title: str = Field(
-        min_length = 10,
-        max_length = 200,
+        min_length=10,
+        max_length=200,
     )
 
     description: str = Field(
-        min_length = 10,
-        max_length = 1000,
+        min_length=10,
+        max_length=1000,
     )
 
     ticket_type: TicketType
@@ -28,16 +28,16 @@ class TicketCreate(BaseModel):
     priority: TicketPriority
 
     business_impact: str = Field(
-        min_length = 10,
-        max_length = 100,
+        min_length=10,
+        max_length=100,
     )
 
     created_by: str = Field(
-        min_length = 2,
-        max_length = 50,
+        min_length=2,
+        max_length=50,
     )
 
-    assigned_to: str|None = None
+    assigned_to: str | None = None
 
     def to_domain(self, ticket_id: str) -> Ticket:
         return Ticket(
@@ -50,6 +50,7 @@ class TicketCreate(BaseModel):
             created_by=self.created_by,
             assigned_to=self.assigned_to,
         )
+
 
 class TicketResponse(BaseModel):
     ticket_id: str
@@ -68,9 +69,44 @@ class TicketResponse(BaseModel):
 
 
 class TicketStatusUpdate(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "status": "investigating",
+                    "actor": "Reporting operations",
+                    "reason": "Confirmed the refresh failure.",
+                }
+            ]
+        }
+    )
+
     status: TicketStatus
-    actor: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None = None
-    reason: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None = None
+    actor: (
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None
+    ) = None
+    reason: (
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None
+    ) = None
+
+
+class TicketSprintUpdate(BaseModel):
+    sprint_id: (
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None
+    )
+
+
+class TicketSprintResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    ticket_id: str
+    sprint_id: str | None
+
+
+class TicketAssignmentUpdate(BaseModel):
+    assigned_to: (
+        Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None
+    )
 
 
 class TicketEventResponse(BaseModel):
@@ -89,7 +125,9 @@ class TicketEventResponse(BaseModel):
             event_id=event.event_id,
             ticket_id=event.ticket_id,
             event_type=event.event_type,
-            previous_status=event.previous_status.name if event.previous_status is not None else None,
+            previous_status=event.previous_status.name
+            if event.previous_status is not None
+            else None,
             new_status=event.new_status.name,
             occurred_at=event.occurred_at,
             actor=event.actor,

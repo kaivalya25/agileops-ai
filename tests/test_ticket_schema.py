@@ -3,6 +3,7 @@ from pydantic import ValidationError
 
 from agileops.schemas.tickets import TicketCreate
 
+
 def test_invalid_priority_is_rejected():
     with pytest.raises(ValidationError):
         TicketCreate(

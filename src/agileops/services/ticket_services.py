@@ -20,6 +20,17 @@ class TicketService:
     def list_tickets(self) -> list[Ticket]:
         return self.repository.list_all()
 
+    def list_backlog(self) -> list[Ticket]:
+        return self.repository.list_backlog()
+
+    def set_ticket_sprint(self, ticket_id: str, sprint_id: str | None) -> Ticket | None:
+        return self.repository.set_sprint(ticket_id, sprint_id)
+
+    def set_ticket_assignee(
+        self, ticket_id: str, assigned_to: str | None
+    ) -> Ticket | None:
+        return self.repository.set_assignee(ticket_id, assigned_to)
+
     def change_ticket_status(
         self,
         ticket_id: str,
@@ -28,7 +39,9 @@ class TicketService:
         actor: str | None = None,
         reason: str | None = None,
     ) -> Ticket | None:
-        return self.repository.change_status(ticket_id, new_status, actor=actor, reason=reason)
+        return self.repository.change_status(
+            ticket_id, new_status, actor=actor, reason=reason
+        )
 
     def list_ticket_events(self, ticket_id: str) -> list[TicketEvent] | None:
         return self.repository.list_events(ticket_id)

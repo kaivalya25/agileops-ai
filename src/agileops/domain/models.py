@@ -1,31 +1,45 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 
-from agileops.domain.enums import(
+from agileops.domain.enums import (
     TicketEventType,
     TicketPriority,
     TicketStatus,
-    TicketType
+    TicketType,
 )
-
 from agileops.domain.exceptions import InvalidStatusTransitionError
 
+
 def build_ticket_title(
-        incident_id: str, #"INC 26-0001" incident to be written in "INC YY-XXXX"
-        description: str, #"Report is not refreshing since this morning"
+    incident_id: str,  # "INC 26-0001" incident to be written in "INC YY-XXXX"
+    description: str,  # "Report is not refreshing since this morning"
 ) -> str:
     return f"{incident_id}: {description}"
 
+
 ALLOWED_STATUS_TRANSITIONS: dict[
-    TicketStatus, set[TicketStatus],
+    TicketStatus,
+    set[TicketStatus],
 ] = {
-    TicketStatus.NEW:{TicketStatus.INVESTIGATING,},
-    TicketStatus.INVESTIGATING:{TicketStatus.READY_FOR_DEV,},
-    TicketStatus.READY_FOR_DEV:{TicketStatus.IN_PROGRESS,},
-    TicketStatus.IN_PROGRESS:{TicketStatus.QA,},
-    TicketStatus.QA:{TicketStatus.DONE,TicketStatus.IN_PROGRESS,},
-    TicketStatus.DONE:set(),
+    TicketStatus.NEW: {
+        TicketStatus.INVESTIGATING,
+    },
+    TicketStatus.INVESTIGATING: {
+        TicketStatus.READY_FOR_DEV,
+    },
+    TicketStatus.READY_FOR_DEV: {
+        TicketStatus.IN_PROGRESS,
+    },
+    TicketStatus.IN_PROGRESS: {
+        TicketStatus.QA,
+    },
+    TicketStatus.QA: {
+        TicketStatus.DONE,
+        TicketStatus.IN_PROGRESS,
+    },
+    TicketStatus.DONE: set(),
 }
+
 
 @dataclass
 class Ticket:
@@ -36,9 +50,10 @@ class Ticket:
     priority: TicketPriority
     business_impact: str
     created_by: str
-    assigned_to: str|None = None
+    assigned_to: str | None = None
     status: TicketStatus = TicketStatus.NEW
     incident_id: str | None = None
+    sprint_id: str | None = None
 
     def change_status(self, new_status: TicketStatus) -> None:
         if new_status not in ALLOWED_STATUS_TRANSITIONS[self.status]:
@@ -47,7 +62,7 @@ class Ticket:
             )
         self.status = new_status
 
-    def to_dict(self) -> dict[str, str|None]:
+    def to_dict(self) -> dict[str, str | None]:
         return {
             "ticket_id": self.ticket_id,
             "title": self.title,
@@ -79,12 +94,12 @@ class Incident:
     summary: str
     reported_by: str
     business_impact: str
-    affected_system: str| None = None
+    affected_system: str | None = None
 
     def create_ticket_from_incident(
-            incident: "Incident",
-            ticket_id: str,
-            priority: TicketPriority,
+        incident: "Incident",
+        ticket_id: str,
+        priority: TicketPriority,
     ) -> Ticket:
         title = build_ticket_title(incident.incident_id, incident.summary)
         return Ticket(
@@ -97,3 +112,11 @@ class Incident:
             created_by=incident.reported_by,
             incident_id=incident.incident_id,
         )
+
+
+@dataclass(frozen=True)
+class Sprint:
+    sprint_id: str
+    name: str
+    planned_start_date: date
+    planned_end_date: date

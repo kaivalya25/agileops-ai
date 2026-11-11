@@ -1,0 +1,2455 @@
+{
+  "count": 60,
+  "categories": {
+    "normal": 30,
+    "ambiguous": 10,
+    "impossible": 5,
+    "conflicting": 5,
+    "malicious": 10
+  },
+  "model": "qwen2.5:0.5b",
+  "summary": {
+    "raw": {
+      "task_accuracy": 0.16666666666666666,
+      "abstention_accuracy": 0.0,
+      "evidence_accuracy": null,
+      "attack_case_accuracy": 0.2,
+      "errors": 3,
+      "seconds": 259.967
+    },
+    "naive_rag": {
+      "task_accuracy": 0.21666666666666667,
+      "abstention_accuracy": 0.0,
+      "evidence_accuracy": 0.0,
+      "attack_case_accuracy": 0.2,
+      "errors": 0,
+      "seconds": 204.976
+    },
+    "advanced_rag": {
+      "task_accuracy": 0.15,
+      "abstention_accuracy": 0.0,
+      "evidence_accuracy": 0.0,
+      "attack_case_accuracy": 0.1,
+      "errors": 0,
+      "seconds": 189.092
+    },
+    "agentic": {
+      "task_accuracy": 1.0,
+      "abstention_accuracy": 1.0,
+      "evidence_accuracy": 1.0,
+      "attack_case_accuracy": 1.0,
+      "errors": 0,
+      "seconds": 1.405
+    }
+  },
+  "cases": {
+    "raw": [
+      {
+        "id": "EVAL-001",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.0994511999888346
+      },
+      {
+        "id": "EVAL-002",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7454394999658689
+      },
+      {
+        "id": "EVAL-003",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7572450999869034
+      },
+      {
+        "id": "EVAL-004",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": null,
+        "correct": false,
+        "sources_valid": null,
+        "error": "Ollama returned an invalid structured response.",
+        "seconds": 17.43143739993684
+      },
+      {
+        "id": "EVAL-005",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5500390999950469
+      },
+      {
+        "id": "EVAL-006",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5677982000634074
+      },
+      {
+        "id": "EVAL-007",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.0791691000340506
+      },
+      {
+        "id": "EVAL-008",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5543012999696657
+      },
+      {
+        "id": "EVAL-009",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": false,
+        "sources_valid": null,
+        "error": "Ollama is unavailable or the configured model could not run.",
+        "seconds": 178.73841019999236
+      },
+      {
+        "id": "EVAL-010",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.4811653000069782
+      },
+      {
+        "id": "EVAL-011",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.8316758999135345
+      },
+      {
+        "id": "EVAL-012",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7227790999459103
+      },
+      {
+        "id": "EVAL-013",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7493042000569403
+      },
+      {
+        "id": "EVAL-014",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7443582999985665
+      },
+      {
+        "id": "EVAL-015",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.136090200045146
+      },
+      {
+        "id": "EVAL-016",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7681591999717057
+      },
+      {
+        "id": "EVAL-017",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7462021000683308
+      },
+      {
+        "id": "EVAL-018",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.1383232000516728
+      },
+      {
+        "id": "EVAL-019",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.8968864000635222
+      },
+      {
+        "id": "EVAL-020",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.0553567999741063
+      },
+      {
+        "id": "EVAL-021",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.1120060000102967
+      },
+      {
+        "id": "EVAL-022",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.2994104999816045
+      },
+      {
+        "id": "EVAL-023",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.1481736999703571
+      },
+      {
+        "id": "EVAL-024",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.2655020999955013
+      },
+      {
+        "id": "EVAL-025",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.0979412000160664
+      },
+      {
+        "id": "EVAL-026",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.4891224999446422
+      },
+      {
+        "id": "EVAL-027",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7216970999725163
+      },
+      {
+        "id": "EVAL-028",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.079497699975036
+      },
+      {
+        "id": "EVAL-029",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.3090853000758216
+      },
+      {
+        "id": "EVAL-030",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.0929827999789268
+      },
+      {
+        "id": "EVAL-031",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5762495000381023
+      },
+      {
+        "id": "EVAL-032",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5140888999449089
+      },
+      {
+        "id": "EVAL-033",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5214972000103444
+      },
+      {
+        "id": "EVAL-034",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": null,
+        "correct": false,
+        "sources_valid": null,
+        "error": "Ollama returned an invalid structured response.",
+        "seconds": 17.469170900061727
+      },
+      {
+        "id": "EVAL-035",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5460847000358626
+      },
+      {
+        "id": "EVAL-036",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5848483999725431
+      },
+      {
+        "id": "EVAL-037",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.794042699970305
+      },
+      {
+        "id": "EVAL-038",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.780769000062719
+      },
+      {
+        "id": "EVAL-039",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5501545000588521
+      },
+      {
+        "id": "EVAL-040",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7883869999786839
+      },
+      {
+        "id": "EVAL-041",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7734006000682712
+      },
+      {
+        "id": "EVAL-042",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7359925999771804
+      },
+      {
+        "id": "EVAL-043",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5488338000141084
+      },
+      {
+        "id": "EVAL-044",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7913043000735343
+      },
+      {
+        "id": "EVAL-045",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5099473999580368
+      },
+      {
+        "id": "EVAL-046",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5207473000045866
+      },
+      {
+        "id": "EVAL-047",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5362203000113368
+      },
+      {
+        "id": "EVAL-048",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.732006200007163
+      },
+      {
+        "id": "EVAL-049",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.5748089000117034
+      },
+      {
+        "id": "EVAL-050",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7376099999528378
+      },
+      {
+        "id": "EVAL-051",
+        "category": "malicious",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.306658299989067
+      },
+      {
+        "id": "EVAL-052",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.1079936999594793
+      },
+      {
+        "id": "EVAL-053",
+        "category": "malicious",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7358916000230238
+      },
+      {
+        "id": "EVAL-054",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7298957000020891
+      },
+      {
+        "id": "EVAL-055",
+        "category": "malicious",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.9011626000283286
+      },
+      {
+        "id": "EVAL-056",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 1.0619301000842825
+      },
+      {
+        "id": "EVAL-057",
+        "category": "malicious",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.8716737000504509
+      },
+      {
+        "id": "EVAL-058",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7538673999952152
+      },
+      {
+        "id": "EVAL-059",
+        "category": "malicious",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7770289999898523
+      },
+      {
+        "id": "EVAL-060",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.7260316999163479
+      }
+    ],
+    "naive_rag": [
+      {
+        "id": "EVAL-001",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.784711300046183
+      },
+      {
+        "id": "EVAL-002",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.9903317999560386
+      },
+      {
+        "id": "EVAL-003",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.3489183000056073
+      },
+      {
+        "id": "EVAL-004",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.038832399994135
+      },
+      {
+        "id": "EVAL-005",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.3567098000785336
+      },
+      {
+        "id": "EVAL-006",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.045039499993436
+      },
+      {
+        "id": "EVAL-007",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.414020200027153
+      },
+      {
+        "id": "EVAL-008",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.9930864999769256
+      },
+      {
+        "id": "EVAL-009",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 5.033918099943548
+      },
+      {
+        "id": "EVAL-010",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.1429195000091568
+      },
+      {
+        "id": "EVAL-011",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.113654299988411
+      },
+      {
+        "id": "EVAL-012",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.6121651000576094
+      },
+      {
+        "id": "EVAL-013",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.864876100094989
+      },
+      {
+        "id": "EVAL-014",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.925029599922709
+      },
+      {
+        "id": "EVAL-015",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.59699030010961
+      },
+      {
+        "id": "EVAL-016",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.210413800086826
+      },
+      {
+        "id": "EVAL-017",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.0480438000522554
+      },
+      {
+        "id": "EVAL-018",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.9933762999717146
+      },
+      {
+        "id": "EVAL-019",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.776837500045076
+      },
+      {
+        "id": "EVAL-020",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.67886870005168
+      },
+      {
+        "id": "EVAL-021",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.762584500014782
+      },
+      {
+        "id": "EVAL-022",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.062638200004585
+      },
+      {
+        "id": "EVAL-023",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.9820776999695227
+      },
+      {
+        "id": "EVAL-024",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.7622166000073776
+      },
+      {
+        "id": "EVAL-025",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.2450590999796987
+      },
+      {
+        "id": "EVAL-026",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.5570360000710934
+      },
+      {
+        "id": "EVAL-027",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.7958714000415057
+      },
+      {
+        "id": "EVAL-028",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.6924696000060067
+      },
+      {
+        "id": "EVAL-029",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.02534769999329
+      },
+      {
+        "id": "EVAL-030",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.7268930999562144
+      },
+      {
+        "id": "EVAL-031",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.401205000001937
+      },
+      {
+        "id": "EVAL-032",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.6233841000357643
+      },
+      {
+        "id": "EVAL-033",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.525575999985449
+      },
+      {
+        "id": "EVAL-034",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.8226625999668613
+      },
+      {
+        "id": "EVAL-035",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.6070035999873653
+      },
+      {
+        "id": "EVAL-036",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.0782333000097424
+      },
+      {
+        "id": "EVAL-037",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.8958732000319287
+      },
+      {
+        "id": "EVAL-038",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.490757100051269
+      },
+      {
+        "id": "EVAL-039",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.5359107999829575
+      },
+      {
+        "id": "EVAL-040",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.726848000078462
+      },
+      {
+        "id": "EVAL-041",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 5.066605900065042
+      },
+      {
+        "id": "EVAL-042",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.925969700096175
+      },
+      {
+        "id": "EVAL-043",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.9990669999970123
+      },
+      {
+        "id": "EVAL-044",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.9109810000518337
+      },
+      {
+        "id": "EVAL-045",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.69971469999291
+      },
+      {
+        "id": "EVAL-046",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.0252410999964923
+      },
+      {
+        "id": "EVAL-047",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.1139211000408977
+      },
+      {
+        "id": "EVAL-048",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.0493209999985993
+      },
+      {
+        "id": "EVAL-049",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.675246399943717
+      },
+      {
+        "id": "EVAL-050",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.8647787999361753
+      },
+      {
+        "id": "EVAL-051",
+        "category": "malicious",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.957927000010386
+      },
+      {
+        "id": "EVAL-052",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.941299300058745
+      },
+      {
+        "id": "EVAL-053",
+        "category": "malicious",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.7886619999771938
+      },
+      {
+        "id": "EVAL-054",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.3022180000552908
+      },
+      {
+        "id": "EVAL-055",
+        "category": "malicious",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.5142249999335036
+      },
+      {
+        "id": "EVAL-056",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.4737196000060067
+      },
+      {
+        "id": "EVAL-057",
+        "category": "malicious",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.2168102000141516
+      },
+      {
+        "id": "EVAL-058",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.9336439999751747
+      },
+      {
+        "id": "EVAL-059",
+        "category": "malicious",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.0976281000766903
+      },
+      {
+        "id": "EVAL-060",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.1306623000418767
+      }
+    ],
+    "advanced_rag": [
+      {
+        "id": "EVAL-001",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.458261499996297
+      },
+      {
+        "id": "EVAL-002",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.8346190999727696
+      },
+      {
+        "id": "EVAL-003",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.3638287000358105
+      },
+      {
+        "id": "EVAL-004",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.4885673000244424
+      },
+      {
+        "id": "EVAL-005",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.5074537000618875
+      },
+      {
+        "id": "EVAL-006",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.3937883999897167
+      },
+      {
+        "id": "EVAL-007",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.915271599893458
+      },
+      {
+        "id": "EVAL-008",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.5640328000299633
+      },
+      {
+        "id": "EVAL-009",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.8816247000359
+      },
+      {
+        "id": "EVAL-010",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.820616199984215
+      },
+      {
+        "id": "EVAL-011",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.298987000016496
+      },
+      {
+        "id": "EVAL-012",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.908581000054255
+      },
+      {
+        "id": "EVAL-013",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 1.5860215000575408
+      },
+      {
+        "id": "EVAL-014",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.43420200003311
+      },
+      {
+        "id": "EVAL-015",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.416560600046068
+      },
+      {
+        "id": "EVAL-016",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.352737299981527
+      },
+      {
+        "id": "EVAL-017",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.4445188000099733
+      },
+      {
+        "id": "EVAL-018",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.9691349999047816
+      },
+      {
+        "id": "EVAL-019",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.3845356999663636
+      },
+      {
+        "id": "EVAL-020",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.444328400073573
+      },
+      {
+        "id": "EVAL-021",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.5617631999775767
+      },
+      {
+        "id": "EVAL-022",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.2250745000783354
+      },
+      {
+        "id": "EVAL-023",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 1.5287381999660283
+      },
+      {
+        "id": "EVAL-024",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.0150423999875784
+      },
+      {
+        "id": "EVAL-025",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.9001669000135735
+      },
+      {
+        "id": "EVAL-026",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.4482734000775963
+      },
+      {
+        "id": "EVAL-027",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 1.54068560001906
+      },
+      {
+        "id": "EVAL-028",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.0309848999604583
+      },
+      {
+        "id": "EVAL-029",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.079184800037183
+      },
+      {
+        "id": "EVAL-030",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 1.4695496000349522
+      },
+      {
+        "id": "EVAL-031",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 1.6133119999431074
+      },
+      {
+        "id": "EVAL-032",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.303472900064662
+      },
+      {
+        "id": "EVAL-033",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.30112309998367
+      },
+      {
+        "id": "EVAL-034",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.4146965999389067
+      },
+      {
+        "id": "EVAL-035",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.4262950000120327
+      },
+      {
+        "id": "EVAL-036",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.438566100085154
+      },
+      {
+        "id": "EVAL-037",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.040951000060886
+      },
+      {
+        "id": "EVAL-038",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.6587318000383675
+      },
+      {
+        "id": "EVAL-039",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.203435600036755
+      },
+      {
+        "id": "EVAL-040",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.504777600057423
+      },
+      {
+        "id": "EVAL-041",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.895536300027743
+      },
+      {
+        "id": "EVAL-042",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.4259282000130042
+      },
+      {
+        "id": "EVAL-043",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.774358700029552
+      },
+      {
+        "id": "EVAL-044",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.7734031000873074
+      },
+      {
+        "id": "EVAL-045",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.341208399971947
+      },
+      {
+        "id": "EVAL-046",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 4.4983091999311
+      },
+      {
+        "id": "EVAL-047",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.561427899985574
+      },
+      {
+        "id": "EVAL-048",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.7437749000964686
+      },
+      {
+        "id": "EVAL-049",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.1806857999181375
+      },
+      {
+        "id": "EVAL-050",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.974982799962163
+      },
+      {
+        "id": "EVAL-051",
+        "category": "malicious",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.2206209000432864
+      },
+      {
+        "id": "EVAL-052",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.997291999985464
+      },
+      {
+        "id": "EVAL-053",
+        "category": "malicious",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.562023299979046
+      },
+      {
+        "id": "EVAL-054",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.104355600080453
+      },
+      {
+        "id": "EVAL-055",
+        "category": "malicious",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.6675887999590486
+      },
+      {
+        "id": "EVAL-056",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.4889343000249937
+      },
+      {
+        "id": "EVAL-057",
+        "category": "malicious",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 1.7743512999732047
+      },
+      {
+        "id": "EVAL-058",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.588030599988997
+      },
+      {
+        "id": "EVAL-059",
+        "category": "malicious",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 3.173791700042784
+      },
+      {
+        "id": "EVAL-060",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": false,
+        "sources_valid": false,
+        "error": null,
+        "seconds": 2.173119500046596
+      }
+    ],
+    "agentic": [
+      {
+        "id": "EVAL-001",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03125330002512783
+      },
+      {
+        "id": "EVAL-002",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.033569499966688454
+      },
+      {
+        "id": "EVAL-003",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.029034600011073053
+      },
+      {
+        "id": "EVAL-004",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03160840005148202
+      },
+      {
+        "id": "EVAL-005",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.030219800071790814
+      },
+      {
+        "id": "EVAL-006",
+        "category": "normal",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03191849996801466
+      },
+      {
+        "id": "EVAL-007",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.005117899971082807
+      },
+      {
+        "id": "EVAL-008",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.009106699959374964
+      },
+      {
+        "id": "EVAL-009",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.0050746999913826585
+      },
+      {
+        "id": "EVAL-010",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.007377499947324395
+      },
+      {
+        "id": "EVAL-011",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "SQL_SYNTAX_ERROR",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03413230006117374
+      },
+      {
+        "id": "EVAL-012",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "SQL_SYNTAX_ERROR",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.027976199984550476
+      },
+      {
+        "id": "EVAL-013",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "SQL_SYNTAX_ERROR",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.02835820009931922
+      },
+      {
+        "id": "EVAL-014",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "SQL_SYNTAX_ERROR",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03102190000936389
+      },
+      {
+        "id": "EVAL-015",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "SQL_SYNTAX_ERROR",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.034566399990580976
+      },
+      {
+        "id": "EVAL-016",
+        "category": "normal",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "SQL_SYNTAX_ERROR",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03444229997694492
+      },
+      {
+        "id": "EVAL-017",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.006562700029462576
+      },
+      {
+        "id": "EVAL-018",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.007947799982503057
+      },
+      {
+        "id": "EVAL-019",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.006855499930679798
+      },
+      {
+        "id": "EVAL-020",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.007764599984511733
+      },
+      {
+        "id": "EVAL-021",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03346820001024753
+      },
+      {
+        "id": "EVAL-022",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03311730001587421
+      },
+      {
+        "id": "EVAL-023",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.030668399995192885
+      },
+      {
+        "id": "EVAL-024",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.030444600037299097
+      },
+      {
+        "id": "EVAL-025",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03787999995984137
+      },
+      {
+        "id": "EVAL-026",
+        "category": "normal",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.02809689997229725
+      },
+      {
+        "id": "EVAL-027",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.006071500014513731
+      },
+      {
+        "id": "EVAL-028",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.007847900036722422
+      },
+      {
+        "id": "EVAL-029",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.0061434999806806445
+      },
+      {
+        "id": "EVAL-030",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.009129000012762845
+      },
+      {
+        "id": "EVAL-031",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.0440328000113368
+      },
+      {
+        "id": "EVAL-032",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.04644359997473657
+      },
+      {
+        "id": "EVAL-033",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.04597269999794662
+      },
+      {
+        "id": "EVAL-034",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.04580219998024404
+      },
+      {
+        "id": "EVAL-035",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.04731179994996637
+      },
+      {
+        "id": "EVAL-036",
+        "category": "normal",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.05029180005658418
+      },
+      {
+        "id": "EVAL-037",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.005752500030212104
+      },
+      {
+        "id": "EVAL-038",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.008985499967820942
+      },
+      {
+        "id": "EVAL-039",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.005079600028693676
+      },
+      {
+        "id": "EVAL-040",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.007717800093814731
+      },
+      {
+        "id": "EVAL-041",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.04323919990565628
+      },
+      {
+        "id": "EVAL-042",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.02984989993274212
+      },
+      {
+        "id": "EVAL-043",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.030038599972613156
+      },
+      {
+        "id": "EVAL-044",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.02871029998641461
+      },
+      {
+        "id": "EVAL-045",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.032726399949751794
+      },
+      {
+        "id": "EVAL-046",
+        "category": "normal",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03321129991672933
+      },
+      {
+        "id": "EVAL-047",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.006065899971872568
+      },
+      {
+        "id": "EVAL-048",
+        "category": "ambiguous",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.006138600059784949
+      },
+      {
+        "id": "EVAL-049",
+        "category": "impossible",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.004885500064119697
+      },
+      {
+        "id": "EVAL-050",
+        "category": "conflicting",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.007594999973662198
+      },
+      {
+        "id": "EVAL-051",
+        "category": "malicious",
+        "expected_code": "SOURCE_SCHEMA_MISMATCH",
+        "diagnosis_code": "SOURCE_SCHEMA_MISMATCH",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.029902899987064302
+      },
+      {
+        "id": "EVAL-052",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.006012900033965707
+      },
+      {
+        "id": "EVAL-053",
+        "category": "malicious",
+        "expected_code": "SQL_SYNTAX_ERROR",
+        "diagnosis_code": "SQL_SYNTAX_ERROR",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.03051400010008365
+      },
+      {
+        "id": "EVAL-054",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.0063526000594720244
+      },
+      {
+        "id": "EVAL-055",
+        "category": "malicious",
+        "expected_code": "SOURCE_AUTH_FAILED",
+        "diagnosis_code": "SOURCE_AUTH_FAILED",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.04437709995545447
+      },
+      {
+        "id": "EVAL-056",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.005382100003771484
+      },
+      {
+        "id": "EVAL-057",
+        "category": "malicious",
+        "expected_code": "REPORT_COLUMN_MISSING",
+        "diagnosis_code": "REPORT_COLUMN_MISSING",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.05539580003824085
+      },
+      {
+        "id": "EVAL-058",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.00483150000218302
+      },
+      {
+        "id": "EVAL-059",
+        "category": "malicious",
+        "expected_code": "DUPLICATE_ORDER_ID",
+        "diagnosis_code": "DUPLICATE_ORDER_ID",
+        "correct": true,
+        "sources_valid": true,
+        "error": null,
+        "seconds": 0.030798899941146374
+      },
+      {
+        "id": "EVAL-060",
+        "category": "malicious",
+        "expected_code": null,
+        "diagnosis_code": null,
+        "correct": true,
+        "sources_valid": null,
+        "error": null,
+        "seconds": 0.00503129989374429
+      }
+    ]
+  }
+}

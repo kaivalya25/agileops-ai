@@ -62,5 +62,7 @@ class SQLiteIncidentRepository:
 
     def list_all(self) -> list[Incident]:
         with connect(self.database_path) as connection:
-            rows = connection.execute("SELECT * FROM incidents ORDER BY report_year, number")
+            rows = connection.execute(
+                "SELECT * FROM incidents ORDER BY report_year, number"
+            )
             return [_to_incident(row) for row in rows]

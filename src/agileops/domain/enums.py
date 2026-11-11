@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class TicketStatus(str, Enum):
     NEW = "new"
     INVESTIGATING = "investigating"
@@ -8,11 +9,13 @@ class TicketStatus(str, Enum):
     QA = "qa"
     DONE = "done"
 
+
 class TicketPriority(str, Enum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+
 
 class TicketType(str, Enum):
     BUG = "bug"

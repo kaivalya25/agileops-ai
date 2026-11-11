@@ -3,7 +3,6 @@ from collections.abc import Iterator
 from contextlib import closing, contextmanager
 from pathlib import Path
 
-
 # Each entry is one schema version. Append new migrations in application order.
 MIGRATIONS = (
     (
@@ -99,6 +98,44 @@ MIGRATIONS = (
         END
         """,
     ),
+    (
+        """
+        CREATE TABLE sprints (
+            number INTEGER PRIMARY KEY,
+            sprint_id TEXT NOT NULL UNIQUE,
+            name TEXT NOT NULL,
+            planned_start_date TEXT NOT NULL,
+            planned_end_date TEXT NOT NULL,
+            CHECK (planned_start_date <= planned_end_date)
+        )
+        """,
+        "ALTER TABLE tickets ADD COLUMN sprint_id TEXT REFERENCES sprints (sprint_id)",
+        "CREATE INDEX tickets_by_sprint ON tickets (sprint_id, number)",
+    ),
+    (
+        """
+        CREATE TABLE ticket_block_events (
+            event_id INTEGER PRIMARY KEY,
+            ticket_id TEXT NOT NULL REFERENCES tickets (ticket_id),
+            blocked INTEGER NOT NULL CHECK (blocked IN (0, 1)),
+            actor TEXT NOT NULL, reason TEXT NOT NULL, occurred_at TEXT NOT NULL
+        )
+        """,
+        "CREATE INDEX ticket_blocks_by_ticket ON ticket_block_events (ticket_id, event_id)",
+        """
+        CREATE VIEW bi_tickets AS
+        SELECT ticket_id, ticket_type, priority, status, sprint_id, assigned_to, incident_id
+        FROM tickets
+        """,
+        """
+        CREATE VIEW bi_sprints AS
+        SELECT sprint_id, name, planned_start_date, planned_end_date FROM sprints
+        """,
+        """
+        CREATE VIEW bi_events AS
+        SELECT ticket_id, event_type, previous_status, new_status, occurred_at FROM ticket_events
+        """,
+    ),
 )
 
 
@@ -124,7 +161,9 @@ def migrate(database_path: Path) -> None:
         if not 0 <= version <= len(MIGRATIONS):
             raise RuntimeError(f"Unsupported database schema version {version}.")
 
-        for next_version, statements in enumerate(MIGRATIONS[version:], start=version + 1):
+        for next_version, statements in enumerate(
+            MIGRATIONS[version:], start=version + 1
+        ):
             for statement in statements:
                 connection.execute(statement)
             connection.execute(f"PRAGMA user_version = {next_version}")

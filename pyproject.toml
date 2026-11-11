@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agileops-ai"
-version = "0.1.0"
+version = "1.0.0rc1"
 description = "Multi-agent IT incident investigation and Agile delivery platform"
 requires-python = ">=3.10"
 dependencies = [
@@ -16,8 +16,19 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "httpx"
+    "httpx",
+    "ruff",
+    "pip-audit"
 ]
+ai = [
+    "faiss-cpu>=1.10,<2",
+    "sentence-transformers>=4,<6",
+    "langgraph>=1,<2",
+    "langgraph-checkpoint-sqlite>=3,<4"
+]
+
+[tool.setuptools.package-data]
+agileops = ["runbooks/*.md", "assets/*.html"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -8,7 +8,9 @@ from agileops.schemas.incidents import IncidentCreate
 
 
 class IncidentService:
-    def __init__(self, incidents: IncidentRepository, tickets: TicketRepository) -> None:
+    def __init__(
+        self, incidents: IncidentRepository, tickets: TicketRepository
+    ) -> None:
         self.incidents = incidents
         self.tickets = tickets
 
@@ -21,12 +23,16 @@ class IncidentService:
     def list_incidents(self) -> list[Incident]:
         return self.incidents.list_all()
 
-    def create_ticket(self, incident_id: str, priority: TicketPriority) -> Ticket | None:
+    def create_ticket(
+        self, incident_id: str, priority: TicketPriority
+    ) -> Ticket | None:
         incident = self.incidents.get_by_id(incident_id)
         if incident is None:
             return None
 
-        return self.tickets.create(partial(incident.create_ticket_from_incident, priority=priority))
+        return self.tickets.create(
+            partial(incident.create_ticket_from_incident, priority=priority)
+        )
 
     def list_incident_tickets(self, incident_id: str) -> list[Ticket] | None:
         return self.tickets.list_by_incident(incident_id)

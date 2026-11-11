@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from agileops.main import create_app
 from agileops.repositories import sqlite_ticket_repository
 
-
 TICKET_DATA = {
     "title": "Repair dashboard refresh",
     "description": "Investigate the broken dashboard refresh.",
@@ -47,10 +46,14 @@ def set_event_times(monkeypatch):
     return configure
 
 
-def test_ticket_metrics_include_rework_and_completed_qa_visits(tmp_path, set_event_times):
+def test_ticket_metrics_include_rework_and_completed_qa_visits(
+    tmp_path, set_event_times
+):
     path = tmp_path / "tickets.db"
     start = datetime(2026, 11, 1, tzinfo=timezone.utc)
-    set_event_times(start + timedelta(seconds=offset) for offset in (0, 2, 4, 8, 13, 17, 21, 30))
+    set_event_times(
+        start + timedelta(seconds=offset) for offset in (0, 2, 4, 8, 13, 17, 21, 30)
+    )
     with TestClient(create_app(path)) as client:
         ticket_id = create_ticket(client)
         url = f"/tickets/{ticket_id}/metrics"
@@ -82,14 +85,17 @@ def test_ticket_metrics_include_rework_and_completed_qa_visits(tmp_path, set_eve
         }
 
 
-def test_throughput_counts_completions_within_utc_date_boundaries(tmp_path, set_event_times):
+def test_throughput_counts_completions_within_utc_date_boundaries(
+    tmp_path, set_event_times
+):
     path = tmp_path / "tickets.db"
     start = datetime(2026, 11, 1, tzinfo=timezone.utc)
     end = start + timedelta(days=1)
     with TestClient(create_app(path)) as client:
         for completed_at in (start - timedelta(microseconds=1), start, end):
             set_event_times(
-                completed_at - timedelta(seconds=offset) for offset in (5, 4, 3, 2, 1, 0)
+                completed_at - timedelta(seconds=offset)
+                for offset in (5, 4, 3, 2, 1, 0)
             )
             ticket_id = create_ticket(client)
             transition_ticket(client, ticket_id, (*WORKFLOW, "done"))
@@ -101,5 +107,15 @@ def test_throughput_counts_completions_within_utc_date_boundaries(tmp_path, set_
         response = client.get(THROUGHPUT_URL, params=dates)
         assert response.status_code == 200
         assert response.json() == {**dates, "completed_tickets": 1}
-        assert client.get(THROUGHPUT_URL, params={**dates, "start_date": "2026-11-02"}).status_code == 422
-        assert client.get(THROUGHPUT_URL, params={**dates, "start_date": "invalid"}).status_code == 422
+        assert (
+            client.get(
+                THROUGHPUT_URL, params={**dates, "start_date": "2026-11-02"}
+            ).status_code
+            == 422
+        )
+        assert (
+            client.get(
+                THROUGHPUT_URL, params={**dates, "start_date": "invalid"}
+            ).status_code
+            == 422
+        )

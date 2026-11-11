@@ -8,6 +8,7 @@ from agileops.domain.enums import (
 from agileops.domain.exceptions import InvalidStatusTransitionError
 from agileops.domain.models import Ticket
 
+
 def create_sample_ticket() -> Ticket:
     return Ticket(
         ticket_id="TASK-001",
@@ -19,15 +20,18 @@ def create_sample_ticket() -> Ticket:
         created_by="Finance Executive",
     )
 
+
 def test_new_ticket_start_as_new():
     ticket = create_sample_ticket()
 
     assert ticket.status == TicketStatus.NEW
 
+
 def test_valid_status_transition():
     ticket = create_sample_ticket()
     ticket.change_status(TicketStatus.INVESTIGATING)
     assert ticket.status == TicketStatus.INVESTIGATING
+
 
 def test_invalid_status_transition_is_rejected():
     ticket = create_sample_ticket()

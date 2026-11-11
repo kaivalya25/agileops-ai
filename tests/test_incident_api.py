@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 from agileops import database
 from agileops.main import create_app
 
-
 INCIDENT_DATA = {
     "summary": "Sales dashboard refresh failed.",
     "reported_by": "Operations",
@@ -18,17 +17,30 @@ def test_create_list_and_retrieve_incidents(tmp_path):
     with TestClient(create_app(tmp_path / "incidents.db")) as client:
         assert client.get("/incidents").json() == []
         assert client.get("/incidents/unknown").status_code == 404
-        assert client.post("/incidents", json={**INCIDENT_DATA, "summary": "short"}).status_code == 422
+        assert (
+            client.post(
+                "/incidents", json={**INCIDENT_DATA, "summary": "short"}
+            ).status_code
+            == 422
+        )
 
-        response = client.post("/incidents", json={**INCIDENT_DATA, "incident_id": "custom"})
+        response = client.post(
+            "/incidents", json={**INCIDENT_DATA, "incident_id": "custom"}
+        )
         assert response.status_code == 201
         incident = response.json()
         incident_id = incident["incident_id"]
         assert re.fullmatch(r"INC \d{2}-0001", incident_id)
-        assert incident == {**INCIDENT_DATA, "incident_id": incident_id, "affected_system": None}
+        assert incident == {
+            **INCIDENT_DATA,
+            "incident_id": incident_id,
+            "affected_system": None,
+        }
         assert client.get(f"/incidents/{quote(incident_id)}").json() == incident
 
-        second = client.post("/incidents", json={**INCIDENT_DATA, "affected_system": "Reporting"})
+        second = client.post(
+            "/incidents", json={**INCIDENT_DATA, "affected_system": "Reporting"}
+        )
         assert second.status_code == 201
         assert second.json()["affected_system"] == "Reporting"
         assert client.get("/incidents").json() == [incident, second.json()]
@@ -43,7 +55,12 @@ def test_incident_tickets_keep_the_ticket_contract_and_history(tmp_path):
         other_url = f"/incidents/{quote(other['incident_id'])}/tickets"
         assert client.get(url).json() == []
         assert client.get("/incidents/unknown/tickets").status_code == 404
-        assert client.post("/incidents/unknown/tickets", json={"priority": "high"}).status_code == 404
+        assert (
+            client.post(
+                "/incidents/unknown/tickets", json={"priority": "high"}
+            ).status_code
+            == 404
+        )
         assert client.post(url, json={"priority": "urgent"}).status_code == 422
 
         response = client.post(url, json={"priority": "high"})
@@ -65,7 +82,9 @@ def test_incident_tickets_keep_the_ticket_contract_and_history(tmp_path):
         assert client.get(url).json() == [ticket]
         assert client.get(other_url).json() == []
 
-        transition = client.patch("/tickets/TASK-001/status", json={"status": "investigating"})
+        transition = client.patch(
+            "/tickets/TASK-001/status", json={"status": "investigating"}
+        )
         assert transition.status_code == 200
         second = client.post(url, json={"priority": "medium"})
         assert second.status_code == 201
@@ -73,10 +92,16 @@ def test_incident_tickets_keep_the_ticket_contract_and_history(tmp_path):
         assert client.get(url).json() == [transition.json(), second.json()]
 
     with TestClient(create_app(path)) as client:
-        assert client.get(f"/incidents/{quote(incident['incident_id'])}").json() == incident
+        assert (
+            client.get(f"/incidents/{quote(incident['incident_id'])}").json()
+            == incident
+        )
         assert client.get(url).json() == [transition.json(), second.json()]
         history = client.get("/tickets/TASK-001/events").json()
-        assert [event["event_type"] for event in history] == ["created", "status_changed"]
+        assert [event["event_type"] for event in history] == [
+            "created",
+            "status_changed",
+        ]
         assert [event["new_status"] for event in history] == ["NEW", "INVESTIGATING"]
         assert [(event["actor"], event["reason"]) for event in history] == [
             (INCIDENT_DATA["reported_by"], "Ticket created"),
@@ -115,12 +140,22 @@ def test_upgrade_day_five_database_preserves_tickets_and_history(tmp_path, monke
         existing = client.get("/tickets/TASK-001")
         assert existing.status_code == 200
         assert existing.json()["status"] == "INVESTIGATING"
+        assert client.get("/tickets/TASK-001/sprint").json() == {
+            "ticket_id": "TASK-001",
+            "sprint_id": None,
+        }
+        assert client.get("/tickets/backlog").json() == [existing.json()]
         history = client.get("/tickets/TASK-001/events").json()
         assert [event["event_id"] for event in history] == [1, 2]
         assert [event["new_status"] for event in history] == ["NEW", "INVESTIGATING"]
-        assert [(event["actor"], event["reason"]) for event in history] == [(None, None), (None, None)]
+        assert [(event["actor"], event["reason"]) for event in history] == [
+            (None, None),
+            (None, None),
+        ]
 
-        incident_id = client.post("/incidents", json=INCIDENT_DATA).json()["incident_id"]
+        incident_id = client.post("/incidents", json=INCIDENT_DATA).json()[
+            "incident_id"
+        ]
         url = f"/incidents/{quote(incident_id)}/tickets"
         response = client.post(url, json={"priority": "high"})
         assert response.status_code == 201
@@ -128,7 +163,9 @@ def test_upgrade_day_five_database_preserves_tickets_and_history(tmp_path, monke
         assert client.get(url).json() == [response.json()]
 
     with database.connect(path) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == len(database.MIGRATIONS)
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == len(
+            database.MIGRATIONS
+        )
         assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
         rows = connection.execute("SELECT incident_id FROM tickets ORDER BY number")
         assert [row["incident_id"] for row in rows] == [None, incident_id]

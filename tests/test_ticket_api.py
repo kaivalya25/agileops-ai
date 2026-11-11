@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
 
-import pytest
 from fastapi.testclient import TestClient
 
 from agileops.main import create_app
-
 
 TICKET_DATA = {
     "title": "Fix dashboard refresh",
@@ -16,20 +14,22 @@ TICKET_DATA = {
 }
 
 
-@pytest.fixture
-def client(tmp_path):
-    with TestClient(create_app(tmp_path / "tickets.db")) as client:
-        yield client
-
-
 def test_day_four_ticket_api(client):
     assert client.get("/health").json() == {"status": "ok"}
     assert client.get("/tickets").json() == []
     assert client.get("/tickets/TASK-999").status_code == 404
-    assert client.post("/tickets", json={**TICKET_DATA, "priority": "banana"}).status_code == 422
-    assert client.post("/tickets", json={**TICKET_DATA, "title": "short"}).status_code == 422
+    assert (
+        client.post("/tickets", json={**TICKET_DATA, "priority": "banana"}).status_code
+        == 422
+    )
+    assert (
+        client.post("/tickets", json={**TICKET_DATA, "title": "short"}).status_code
+        == 422
+    )
 
-    response = client.post("/tickets", json={**TICKET_DATA, "status": "done", "ticket_id": "custom"})
+    response = client.post(
+        "/tickets", json={**TICKET_DATA, "status": "done", "ticket_id": "custom"}
+    )
     assert response.status_code == 201
     ticket = {
         **TICKET_DATA,
@@ -50,13 +50,32 @@ def test_status_workflow_and_ordered_history(client):
     status_url = "/tickets/TASK-001/status"
     events_url = "/tickets/TASK-001/events"
 
-    assert client.patch("/tickets/TASK-999/status", json={"status": "investigating"}).status_code == 404
+    assert (
+        client.patch(
+            "/tickets/TASK-999/status", json={"status": "investigating"}
+        ).status_code
+        == 404
+    )
     assert client.get("/tickets/TASK-999/events").status_code == 404
     assert client.patch(status_url, json={"status": "unknown"}).status_code == 422
-    assert client.patch(status_url, json={"status": "investigating", "actor": " "}).status_code == 422
+    assert (
+        client.patch(
+            status_url, json={"status": "investigating", "actor": " "}
+        ).status_code
+        == 422
+    )
     assert client.patch(status_url, json={"status": "done"}).status_code == 409
 
-    workflow = ["new", "investigating", "ready_for_dev", "in_progress", "qa", "in_progress", "qa", "done"]
+    workflow = [
+        "new",
+        "investigating",
+        "ready_for_dev",
+        "in_progress",
+        "qa",
+        "in_progress",
+        "qa",
+        "done",
+    ]
     for next_status in workflow[1:]:
         response = client.patch(status_url, json={"status": next_status})
         assert response.status_code == 200
@@ -65,12 +84,19 @@ def test_status_workflow_and_ordered_history(client):
     assert client.patch(status_url, json={"status": "in_progress"}).status_code == 409
     assert client.get("/tickets/TASK-001").json()["status"] == "DONE"
     events = client.get(events_url).json()
-    assert [event["event_type"] for event in events] == ["created"] + ["status_changed"] * 7
+    assert [event["event_type"] for event in events] == ["created"] + [
+        "status_changed"
+    ] * 7
     assert [event["previous_status"] for event in events] == [None] + [
         status.upper() for status in workflow[:-1]
     ]
-    assert [event["new_status"] for event in events] == [status.upper() for status in workflow]
-    assert (events[0]["actor"], events[0]["reason"]) == (TICKET_DATA["created_by"], "Ticket created")
+    assert [event["new_status"] for event in events] == [
+        status.upper() for status in workflow
+    ]
+    assert (events[0]["actor"], events[0]["reason"]) == (
+        TICKET_DATA["created_by"],
+        "Ticket created",
+    )
     assert {(event["actor"], event["reason"]) for event in events[1:]} == {
         ("unspecified", "No reason provided")
     }
@@ -81,16 +107,18 @@ def test_status_workflow_and_ordered_history(client):
         == timedelta(0)
         for event in events
     )
-    assert [event["event_type"] for event in client.get("/tickets/TASK-002/events").json()] == [
-        "created"
-    ]
+    assert [
+        event["event_type"] for event in client.get("/tickets/TASK-002/events").json()
+    ] == ["created"]
 
 
 def test_ticket_and_history_survive_app_restart(tmp_path, monkeypatch):
     path = tmp_path / "configured.db"
     monkeypatch.setenv("AGILEOPS_DB_PATH", str(path))
     with TestClient(create_app()) as client:
-        response = client.post("/tickets", json={**TICKET_DATA, "assigned_to": "Operations"})
+        response = client.post(
+            "/tickets", json={**TICKET_DATA, "assigned_to": "Operations"}
+        )
         assert response.status_code == 201
         ticket_url = "/tickets/TASK-001"
         response = client.patch(
@@ -113,7 +141,10 @@ def test_ticket_and_history_survive_app_restart(tmp_path, monkeypatch):
     with TestClient(create_app()) as client:
         assert client.get(ticket_url).json() == ticket
         assert client.get(f"{ticket_url}/events").json() == history
-        assert client.post("/tickets", json=TICKET_DATA).json()["ticket_id"] == "TASK-002"
+        assert (
+            client.post("/tickets", json=TICKET_DATA).json()["ticket_id"] == "TASK-002"
+        )
         assert [ticket["ticket_id"] for ticket in client.get("/tickets").json()] == [
-            "TASK-001", "TASK-002"
+            "TASK-001",
+            "TASK-002",
         ]

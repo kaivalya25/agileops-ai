@@ -4,7 +4,13 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 from agileops.database import connect, write_transaction
-from agileops.domain.enums import TicketEventType, TicketPriority, TicketStatus, TicketType
+from agileops.domain.enums import (
+    TicketEventType,
+    TicketPriority,
+    TicketStatus,
+    TicketType,
+)
+from agileops.domain.exceptions import SprintNotFoundError
 from agileops.domain.models import Ticket, TicketEvent
 
 
@@ -20,7 +26,15 @@ def _to_ticket(row: sqlite3.Row) -> Ticket:
         assigned_to=row["assigned_to"],
         status=TicketStatus(row["status"]),
         incident_id=row["incident_id"],
+        sprint_id=row["sprint_id"],
     )
+
+
+def _get_ticket(connection: sqlite3.Connection, ticket_id: str) -> Ticket | None:
+    row = connection.execute(
+        "SELECT * FROM tickets WHERE ticket_id = ?", (ticket_id,)
+    ).fetchone()
+    return _to_ticket(row) if row is not None else None
 
 
 def _to_event(row: sqlite3.Row) -> TicketEvent:
@@ -29,7 +43,9 @@ def _to_event(row: sqlite3.Row) -> TicketEvent:
         event_id=row["event_id"],
         ticket_id=row["ticket_id"],
         event_type=TicketEventType(row["event_type"]),
-        previous_status=TicketStatus(previous_status) if previous_status is not None else None,
+        previous_status=TicketStatus(previous_status)
+        if previous_status is not None
+        else None,
         new_status=TicketStatus(row["new_status"]),
         occurred_at=datetime.fromisoformat(row["occurred_at"]),
         actor=row["actor"],
@@ -82,9 +98,9 @@ class SQLiteTicketRepository:
                 """
                 INSERT INTO tickets (
                     number, ticket_id, title, description, ticket_type, priority,
-                    business_impact, created_by, assigned_to, status, incident_id
+                    business_impact, created_by, assigned_to, status, incident_id, sprint_id
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     number,
@@ -98,6 +114,7 @@ class SQLiteTicketRepository:
                     ticket.assigned_to,
                     ticket.status.value,
                     ticket.incident_id,
+                    ticket.sprint_id,
                 ),
             )
             _append_event(
@@ -111,10 +128,7 @@ class SQLiteTicketRepository:
 
     def get_by_id(self, ticket_id: str) -> Ticket | None:
         with connect(self.database_path) as connection:
-            row = connection.execute(
-                "SELECT * FROM tickets WHERE ticket_id = ?", (ticket_id,)
-            ).fetchone()
-            return _to_ticket(row) if row is not None else None
+            return _get_ticket(connection, ticket_id)
 
     def list_all(self) -> list[Ticket]:
         with connect(self.database_path) as connection:
@@ -136,6 +150,57 @@ class SQLiteTicketRepository:
                 return None
             return [_to_ticket(row) for row in rows if row["ticket_id"] is not None]
 
+    def list_by_sprint(self, sprint_id: str) -> list[Ticket] | None:
+        with connect(self.database_path) as connection:
+            rows = connection.execute(
+                """
+                SELECT tickets.*
+                FROM sprints LEFT JOIN tickets USING (sprint_id)
+                WHERE sprints.sprint_id = ?
+                ORDER BY tickets.number
+                """,
+                (sprint_id,),
+            ).fetchall()
+            if not rows:
+                return None
+            return [_to_ticket(row) for row in rows if row["ticket_id"] is not None]
+
+    def list_backlog(self) -> list[Ticket]:
+        with connect(self.database_path) as connection:
+            rows = connection.execute(
+                "SELECT * FROM tickets WHERE sprint_id IS NULL AND status <> ? ORDER BY number",
+                (TicketStatus.DONE.value,),
+            )
+            return [_to_ticket(row) for row in rows]
+
+    def set_sprint(self, ticket_id: str, sprint_id: str | None) -> Ticket | None:
+        with write_transaction(self.database_path) as connection:
+            ticket = _get_ticket(connection, ticket_id)
+            if ticket is None:
+                return None
+
+            if sprint_id is not None:
+                sprint = connection.execute(
+                    "SELECT 1 FROM sprints WHERE sprint_id = ?", (sprint_id,)
+                ).fetchone()
+                if sprint is None:
+                    raise SprintNotFoundError(f"Sprint {sprint_id} not found.")
+
+            connection.execute(
+                "UPDATE tickets SET sprint_id = ? WHERE ticket_id = ?",
+                (sprint_id, ticket_id),
+            )
+            ticket.sprint_id = sprint_id
+        return ticket
+
+    def set_assignee(self, ticket_id: str, assigned_to: str | None) -> Ticket | None:
+        with write_transaction(self.database_path) as connection:
+            connection.execute(
+                "UPDATE tickets SET assigned_to = ? WHERE ticket_id = ?",
+                (assigned_to, ticket_id),
+            )
+            return _get_ticket(connection, ticket_id)
+
     def change_status(
         self,
         ticket_id: str,
@@ -145,13 +210,10 @@ class SQLiteTicketRepository:
         reason: str | None = None,
     ) -> Ticket | None:
         with write_transaction(self.database_path) as connection:
-            row = connection.execute(
-                "SELECT * FROM tickets WHERE ticket_id = ?", (ticket_id,)
-            ).fetchone()
-            if row is None:
+            ticket = _get_ticket(connection, ticket_id)
+            if ticket is None:
                 return None
 
-            ticket = _to_ticket(row)
             previous_status = ticket.status
             ticket.change_status(new_status)
             connection.execute(

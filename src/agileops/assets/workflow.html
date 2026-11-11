@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgileOps AI | Incident review</title>
+<style>
+:root{font-family:Inter,"Segoe UI",sans-serif;color:#182636;background:#f3f6f9}
+*{box-sizing:border-box}
+body{margin:0}
+header{background:#102b45;color:white;padding:18px max(24px,calc((100vw - 1040px)/2));display:flex;justify-content:space-between;gap:20px}
+header a{color:#baddf7}
+main{max-width:1090px;margin:auto;padding:32px 25px 54px}
+h1{font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-.045em;margin:0 0 12px}
+h2{font-size:1.05rem;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+section{background:white;border:1px solid #dbe5ed;border-radius:12px;padding:19px;min-width:0}
+.wide{grid-column:1/-1}
+p,li,pre{font-size:.92rem;line-height:1.55;margin:0 0 8px}
+.muted{color:#53677b}
+pre{background:#eef4f8;border-radius:6px;padding:12px;overflow:auto}
+ol,ul{margin:0;padding-left:22px}
+#status{margin-bottom:20px}
+</style>
+</head>
+<body>
+<header><strong>AgileOps AI</strong><a href="/dashboard">Delivery dashboard</a></header>
+<main>
+<h1>Incident review</h1>
+<p id="status" class="muted" role="status">Loading workflow…</p>
+<div class="grid" id="content" hidden>
+  <section><h2>Incident intake</h2><p id="incident"></p><p id="impact" class="muted"></p></section>
+  <section><h2>Investigation</h2><p id="hypothesis"></p><p id="evidence" class="muted"></p></section>
+  <section><h2>Approval history</h2><ol id="approvals"></ol></section>
+  <section><h2>QA result</h2><p id="qa"></p><p id="ticket" class="muted"></p></section>
+  <section class="wide"><h2>Controlled patch</h2><pre id="patch"></pre></section>
+</div>
+</main>
+<script>
+const byId = id => document.getElementById(id);
+async function json(path) {
+  const response = await fetch(path);
+  if (!response.ok) throw new Error("The workflow could not be loaded.");
+  return response.json();
+}
+async function load() {
+  try {
+    const id = encodeURIComponent(location.pathname.split("/")[2]);
+    const [workflow, audit] = await Promise.all([json(`/workflows/${id}`), json(`/workflows/${id}/audit`)]);
+    byId("status").textContent = `${workflow.incident_id} · ${workflow.status.replaceAll("_", " ")}`;
+    byId("incident").textContent = workflow.requirements?.business_problem ?? "Intake pending";
+    byId("impact").textContent = workflow.requirements?.business_impact ?? "";
+    byId("hypothesis").textContent = workflow.investigation?.hypothesis?.text ?? "Insufficient evidence";
+    byId("evidence").textContent = (workflow.investigation?.evidence ?? [])
+      .filter(item => item.id.startsWith("log:")).map(item => item.text).join(" ");
+    audit.filter(event => event.category === "approval").forEach(event => {
+      const item = document.createElement("li");
+      item.textContent = `${event.detail.gate.replaceAll("_", " ")} · ${event.detail.approved ? "approved" : "declined"} by ${event.actor}`;
+      byId("approvals").append(item);
+    });
+    if (workflow.pending_approval) {
+      const item = document.createElement("li");
+      item.textContent = `Pending ${workflow.pending_approval.gate.replaceAll("_", " ")}`;
+      byId("approvals").append(item);
+    }
+    byId("qa").textContent = workflow.qa?.output?.trim() ?? "QA pending";
+    byId("ticket").textContent = workflow.ticket_id ?? "Ticket pending";
+    byId("patch").textContent = workflow.engineering?.patch ?? "Patch pending";
+    byId("content").hidden = false;
+  } catch (error) { byId("status").textContent = error.message; }
+}
+load();
+</script>
+</body>
+</html>

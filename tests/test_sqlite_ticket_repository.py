@@ -4,7 +4,12 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 
 from agileops import database
-from agileops.domain.enums import TicketEventType, TicketPriority, TicketStatus, TicketType
+from agileops.domain.enums import (
+    TicketEventType,
+    TicketPriority,
+    TicketStatus,
+    TicketType,
+)
 from agileops.domain.exceptions import InvalidStatusTransitionError
 from agileops.domain.models import Ticket
 from agileops.repositories.sqlite_ticket_repository import SQLiteTicketRepository
@@ -22,19 +27,13 @@ def build_ticket(ticket_id):
     )
 
 
-@pytest.fixture
-def database_path(tmp_path):
-    path = tmp_path / "tickets.db"
-    database.migrate(path)
-    return path
-
-
 def test_failed_migration_rolls_back_schema_and_version(database_path, monkeypatch):
     original_migrations = database.MIGRATIONS
     monkeypatch.setattr(
         database,
         "MIGRATIONS",
-        original_migrations + (
+        original_migrations
+        + (
             ("CREATE TABLE added_table (id INTEGER PRIMARY KEY)",),
             ("CREATE TABLE added_table (id INTEGER PRIMARY KEY)",),
         ),
@@ -44,10 +43,15 @@ def test_failed_migration_rolls_back_schema_and_version(database_path, monkeypat
         database.migrate(database_path)
 
     with database.connect(database_path) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == len(original_migrations)
-        assert connection.execute(
-            "SELECT name FROM sqlite_master WHERE name = 'added_table'"
-        ).fetchone() is None
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == len(
+            original_migrations
+        )
+        assert (
+            connection.execute(
+                "SELECT name FROM sqlite_master WHERE name = 'added_table'"
+            ).fetchone()
+            is None
+        )
 
 
 def test_failed_event_write_rolls_back_ticket_and_number(database_path):
@@ -124,10 +128,12 @@ def test_database_protects_ticket_event_history(database_path, statement, error)
     ticket = repository.create(build_ticket)
     history = repository.list_events(ticket.ticket_id)
 
-    with pytest.raises(sqlite3.IntegrityError, match=error):
-        with database.write_transaction(database_path) as connection:
-            connection.execute("PRAGMA recursive_triggers = OFF")
-            connection.execute(statement)
+    with (
+        pytest.raises(sqlite3.IntegrityError, match=error),
+        database.write_transaction(database_path) as connection,
+    ):
+        connection.execute("PRAGMA recursive_triggers = OFF")
+        connection.execute(statement)
 
     assert repository.list_events(ticket.ticket_id) == history
 
@@ -135,7 +141,11 @@ def test_database_protects_ticket_event_history(database_path, statement, error)
 def test_concurrent_creation_allocates_unique_ordered_ids(database_path):
     repositories = [SQLiteTicketRepository(database_path) for _ in range(16)]
     with ThreadPoolExecutor(max_workers=8) as executor:
-        tickets = list(executor.map(lambda repository: repository.create(build_ticket), repositories))
+        tickets = list(
+            executor.map(
+                lambda repository: repository.create(build_ticket), repositories
+            )
+        )
 
     repository = repositories[0]
     expected_ids = [f"TASK-{number:03d}" for number in range(1, 17)]
@@ -154,7 +164,9 @@ def test_concurrent_duplicate_transition_appends_one_event(database_path):
 
     def attempt_transition(repository):
         try:
-            return repository.change_status(ticket.ticket_id, TicketStatus.INVESTIGATING).status
+            return repository.change_status(
+                ticket.ticket_id, TicketStatus.INVESTIGATING
+            ).status
         except InvalidStatusTransitionError:
             return None
 
@@ -164,5 +176,6 @@ def test_concurrent_duplicate_transition_appends_one_event(database_path):
     assert results.count(TicketStatus.INVESTIGATING) == 1
     assert results.count(None) == 1
     assert [event.new_status for event in first.list_events(ticket.ticket_id)] == [
-        TicketStatus.NEW, TicketStatus.INVESTIGATING
+        TicketStatus.NEW,
+        TicketStatus.INVESTIGATING,
     ]
