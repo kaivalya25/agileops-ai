@@ -53,6 +53,7 @@ def test_status_workflow_and_ordered_history(client):
     assert client.patch("/tickets/TASK-999/status", json={"status": "investigating"}).status_code == 404
     assert client.get("/tickets/TASK-999/events").status_code == 404
     assert client.patch(status_url, json={"status": "unknown"}).status_code == 422
+    assert client.patch(status_url, json={"status": "investigating", "actor": " "}).status_code == 422
     assert client.patch(status_url, json={"status": "done"}).status_code == 409
 
     workflow = ["new", "investigating", "ready_for_dev", "in_progress", "qa", "in_progress", "qa", "done"]
@@ -69,6 +70,10 @@ def test_status_workflow_and_ordered_history(client):
         status.upper() for status in workflow[:-1]
     ]
     assert [event["new_status"] for event in events] == [status.upper() for status in workflow]
+    assert (events[0]["actor"], events[0]["reason"]) == (TICKET_DATA["created_by"], "Ticket created")
+    assert {(event["actor"], event["reason"]) for event in events[1:]} == {
+        ("unspecified", "No reason provided")
+    }
     assert [event["event_id"] for event in events] == [1, 3, 4, 5, 6, 7, 8, 9]
     assert {event["ticket_id"] for event in events} == {"TASK-001"}
     assert all(
@@ -88,11 +93,22 @@ def test_ticket_and_history_survive_app_restart(tmp_path, monkeypatch):
         response = client.post("/tickets", json={**TICKET_DATA, "assigned_to": "Operations"})
         assert response.status_code == 201
         ticket_url = "/tickets/TASK-001"
-        ticket = client.patch(f"{ticket_url}/status", json={"status": "investigating"}).json()
+        response = client.patch(
+            f"{ticket_url}/status",
+            json={
+                "status": "investigating",
+                "actor": "On-call engineer",
+                "reason": "Confirmed the dashboard failure.",
+            },
+        )
+        assert response.status_code == 200
+        ticket = response.json()
         history = client.get(f"{ticket_url}/events").json()
         assert ticket["assigned_to"] == "Operations"
         assert ticket["status"] == "INVESTIGATING"
         assert len(history) == 2
+        assert history[1]["actor"] == "On-call engineer"
+        assert history[1]["reason"] == "Confirmed the dashboard failure."
 
     with TestClient(create_app()) as client:
         assert client.get(ticket_url).json() == ticket

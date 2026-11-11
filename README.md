@@ -313,12 +313,26 @@ The app applies pending SQLite migrations at startup. It stores tickets and even
 | `POST /tickets` | Create a ticket in `NEW` and return it with HTTP 201. |
 | `GET /tickets` | List tickets in creation order. |
 | `GET /tickets/{ticket_id}` | Retrieve a ticket by its public ID, such as `TASK-001`. |
-| `PATCH /tickets/{ticket_id}/status` | Apply a transition using a body such as `{"status": "investigating"}`. |
-| `GET /tickets/{ticket_id}/events` | List creation and accepted status changes in write order, with UTC timestamps. |
+| `PATCH /tickets/{ticket_id}/status` | Apply a transition and record its actor and reason. |
+| `GET /tickets/{ticket_id}/events` | List creation and accepted status changes in write order, with UTC timestamps, actors, and reasons. |
 
 Requests use lowercase enum values. Ticket responses use uppercase enum names. Invalid request bodies return HTTP 422, missing tickets return HTTP 404, and invalid status transitions return HTTP 409. See `/docs` for the request and response schemas.
 
 Run `python -m pytest` to verify the API, workflow, and persistence. The [Day 4 audit and Day 5 plan](docs/day-5-plan.md) records the original gaps and implementation sequence.
+
+## Ticket audit history
+
+Day 7 makes `ticket_events` append-only. Each accepted status change records the previous and new statuses, a server-generated UTC timestamp, and the actor and reason in the same transaction as the ticket update.
+
+```json
+{
+  "status": "investigating",
+  "actor": "On-call engineer",
+  "reason": "Confirmed the dashboard failure."
+}
+```
+
+The API records the actor supplied by the caller. Requests that omit `actor` or `reason` use `unspecified` or `No reason provided`, respectively. Creation events record the ticket creator. Events saved before the audit migration keep `null` for actor and reason.
 
 ## Incident API
 
@@ -336,7 +350,7 @@ Linked tickets use the same ID sequence, workflow, and event history as other ti
 
 ## Ticket metrics
 
-Day 7 adds two read endpoints that use the existing ticket event history. Metrics include standalone and incident-linked tickets.
+These read endpoints use the ticket event history for standalone and incident-linked tickets.
 
 | Method and path | Behavior |
 | --- | --- |

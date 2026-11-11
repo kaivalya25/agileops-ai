@@ -1,6 +1,7 @@
 from datetime import date, datetime
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from agileops.domain.enums import (
     TicketEventType,
@@ -68,6 +69,8 @@ class TicketResponse(BaseModel):
 
 class TicketStatusUpdate(BaseModel):
     status: TicketStatus
+    actor: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None = None
+    reason: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)] | None = None
 
 
 class TicketEventResponse(BaseModel):
@@ -77,6 +80,8 @@ class TicketEventResponse(BaseModel):
     previous_status: str | None
     new_status: str
     occurred_at: datetime
+    actor: str | None
+    reason: str | None
 
     @classmethod
     def from_domain(cls, event: TicketEvent) -> "TicketEventResponse":
@@ -87,6 +92,8 @@ class TicketEventResponse(BaseModel):
             previous_status=event.previous_status.name if event.previous_status is not None else None,
             new_status=event.new_status.name,
             occurred_at=event.occurred_at,
+            actor=event.actor,
+            reason=event.reason,
         )
 
 

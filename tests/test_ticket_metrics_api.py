@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
 from fastapi.testclient import TestClient
 
-from agileops import database
 from agileops.main import create_app
+from agileops.repositories import sqlite_ticket_repository
 
 
 TICKET_DATA = {
@@ -31,24 +32,25 @@ def transition_ticket(client, ticket_id, statuses):
         assert response.status_code == 200
 
 
-def set_event_times(path, ticket_id, timestamps):
-    with database.write_transaction(path) as connection:
-        rows = connection.execute(
-            "SELECT event_id FROM ticket_events WHERE ticket_id = ? ORDER BY event_id",
-            (ticket_id,),
-        ).fetchall()
-        connection.executemany(
-            "UPDATE ticket_events SET occurred_at = ? WHERE event_id = ?",
-            (
-                (timestamp.isoformat(), row["event_id"])
-                for row, timestamp in zip(rows, timestamps, strict=True)
-            ),
-        )
+@pytest.fixture
+def set_event_times(monkeypatch):
+    def configure(timestamps):
+        event_times = iter(timestamps)
+
+        class EventClock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return next(event_times).astimezone(tz)
+
+        monkeypatch.setattr(sqlite_ticket_repository, "datetime", EventClock)
+
+    return configure
 
 
-def test_ticket_metrics_include_rework_and_completed_qa_visits(tmp_path):
+def test_ticket_metrics_include_rework_and_completed_qa_visits(tmp_path, set_event_times):
     path = tmp_path / "tickets.db"
     start = datetime(2026, 11, 1, tzinfo=timezone.utc)
+    set_event_times(start + timedelta(seconds=offset) for offset in (0, 2, 4, 8, 13, 17, 21, 30))
     with TestClient(create_app(path)) as client:
         ticket_id = create_ticket(client)
         url = f"/tickets/{ticket_id}/metrics"
@@ -62,8 +64,6 @@ def test_ticket_metrics_include_rework_and_completed_qa_visits(tmp_path):
         }
 
         transition_ticket(client, ticket_id, (*WORKFLOW, "in_progress", "qa"))
-        times = [start + timedelta(seconds=offset) for offset in (0, 2, 4, 8, 13, 17, 21)]
-        set_event_times(path, ticket_id, times)
         assert client.get(url).json() == {
             "ticket_id": ticket_id,
             "lead_time_seconds": None,
@@ -73,7 +73,6 @@ def test_ticket_metrics_include_rework_and_completed_qa_visits(tmp_path):
         }
 
         transition_ticket(client, ticket_id, ("done",))
-        set_event_times(path, ticket_id, [*times, start + timedelta(seconds=30)])
         assert client.get(url).json() == {
             "ticket_id": ticket_id,
             "lead_time_seconds": 30.0,
@@ -83,23 +82,19 @@ def test_ticket_metrics_include_rework_and_completed_qa_visits(tmp_path):
         }
 
 
-def test_throughput_counts_completions_from_day_six_database(tmp_path, monkeypatch):
-    path = tmp_path / "day-six.db"
+def test_throughput_counts_completions_within_utc_date_boundaries(tmp_path, set_event_times):
+    path = tmp_path / "tickets.db"
     start = datetime(2026, 11, 1, tzinfo=timezone.utc)
     end = start + timedelta(days=1)
-    with monkeypatch.context() as day_six:
-        day_six.setattr(database, "MIGRATIONS", database.MIGRATIONS[:2])
-        with TestClient(create_app(path)) as client:
-            for completed_at in (start - timedelta(microseconds=1), start, end):
-                ticket_id = create_ticket(client)
-                transition_ticket(client, ticket_id, (*WORKFLOW, "done"))
-                set_event_times(
-                    path,
-                    ticket_id,
-                    [completed_at - timedelta(seconds=offset) for offset in (5, 4, 3, 2, 1, 0)],
-                )
+    with TestClient(create_app(path)) as client:
+        for completed_at in (start - timedelta(microseconds=1), start, end):
+            set_event_times(
+                completed_at - timedelta(seconds=offset) for offset in (5, 4, 3, 2, 1, 0)
+            )
             ticket_id = create_ticket(client)
-            set_event_times(path, ticket_id, [start])
+            transition_ticket(client, ticket_id, (*WORKFLOW, "done"))
+        set_event_times([start])
+        create_ticket(client)
 
     with TestClient(create_app(path)) as client:
         dates = {"start_date": "2026-11-01", "end_date": "2026-11-02"}
@@ -108,6 +103,3 @@ def test_throughput_counts_completions_from_day_six_database(tmp_path, monkeypat
         assert response.json() == {**dates, "completed_tickets": 1}
         assert client.get(THROUGHPUT_URL, params={**dates, "start_date": "2026-11-02"}).status_code == 422
         assert client.get(THROUGHPUT_URL, params={**dates, "start_date": "invalid"}).status_code == 422
-
-    with database.connect(path) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == len(database.MIGRATIONS)

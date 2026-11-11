@@ -32,6 +32,8 @@ def _to_event(row: sqlite3.Row) -> TicketEvent:
         previous_status=TicketStatus(previous_status) if previous_status is not None else None,
         new_status=TicketStatus(row["new_status"]),
         occurred_at=datetime.fromisoformat(row["occurred_at"]),
+        actor=row["actor"],
+        reason=row["reason"],
     )
 
 
@@ -39,12 +41,17 @@ def _append_event(
     connection: sqlite3.Connection,
     ticket: Ticket,
     event_type: TicketEventType,
+    *,
+    actor: str | None,
+    reason: str | None,
     previous_status: TicketStatus | None = None,
 ) -> None:
     connection.execute(
         """
-        INSERT INTO ticket_events (ticket_id, event_type, previous_status, new_status, occurred_at)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO ticket_events (
+            ticket_id, event_type, previous_status, new_status, occurred_at, actor, reason
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
         (
             ticket.ticket_id,
@@ -52,6 +59,8 @@ def _append_event(
             previous_status.value if previous_status is not None else None,
             ticket.status.value,
             datetime.now(timezone.utc).isoformat(),
+            (actor or "").strip() or "unspecified",
+            (reason or "").strip() or "No reason provided",
         ),
     )
 
@@ -91,7 +100,13 @@ class SQLiteTicketRepository:
                     ticket.incident_id,
                 ),
             )
-            _append_event(connection, ticket, TicketEventType.CREATED)
+            _append_event(
+                connection,
+                ticket,
+                TicketEventType.CREATED,
+                actor=ticket.created_by,
+                reason="Ticket created",
+            )
         return ticket
 
     def get_by_id(self, ticket_id: str) -> Ticket | None:
@@ -121,7 +136,14 @@ class SQLiteTicketRepository:
                 return None
             return [_to_ticket(row) for row in rows if row["ticket_id"] is not None]
 
-    def change_status(self, ticket_id: str, new_status: TicketStatus) -> Ticket | None:
+    def change_status(
+        self,
+        ticket_id: str,
+        new_status: TicketStatus,
+        *,
+        actor: str | None = None,
+        reason: str | None = None,
+    ) -> Ticket | None:
         with write_transaction(self.database_path) as connection:
             row = connection.execute(
                 "SELECT * FROM tickets WHERE ticket_id = ?", (ticket_id,)
@@ -136,7 +158,14 @@ class SQLiteTicketRepository:
                 "UPDATE tickets SET status = ? WHERE ticket_id = ?",
                 (ticket.status.value, ticket_id),
             )
-            _append_event(connection, ticket, TicketEventType.STATUS_CHANGED, previous_status)
+            _append_event(
+                connection,
+                ticket,
+                TicketEventType.STATUS_CHANGED,
+                actor=actor,
+                reason=reason,
+                previous_status=previous_status,
+            )
         return ticket
 
     def list_events(self, ticket_id: str) -> list[TicketEvent] | None:

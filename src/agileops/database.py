@@ -68,6 +68,37 @@ MIGRATIONS = (
         WHERE event_type = 'status_changed' AND new_status = 'done'
         """,
     ),
+    (
+        "ALTER TABLE ticket_events ADD COLUMN actor TEXT",
+        "ALTER TABLE ticket_events ADD COLUMN reason TEXT",
+        # REPLACE can skip delete triggers when recursive triggers are disabled.
+        """
+        CREATE TRIGGER ticket_events_guard_insert
+        BEFORE INSERT ON ticket_events
+        BEGIN
+            SELECT RAISE(ABORT, 'ticket_events is append-only')
+            WHERE EXISTS (SELECT 1 FROM ticket_events WHERE event_id = NEW.event_id);
+
+            SELECT RAISE(ABORT, 'ticket events require an actor and reason')
+            WHERE NEW.actor IS NULL OR length(trim(NEW.actor)) = 0
+               OR NEW.reason IS NULL OR length(trim(NEW.reason)) = 0;
+        END
+        """,
+        """
+        CREATE TRIGGER ticket_events_prevent_update
+        BEFORE UPDATE ON ticket_events
+        BEGIN
+            SELECT RAISE(ABORT, 'ticket_events is append-only');
+        END
+        """,
+        """
+        CREATE TRIGGER ticket_events_prevent_delete
+        BEFORE DELETE ON ticket_events
+        BEGIN
+            SELECT RAISE(ABORT, 'ticket_events is append-only');
+        END
+        """,
+    ),
 )
 
 

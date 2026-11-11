@@ -69,6 +69,8 @@ class TicketEvent:
     previous_status: TicketStatus | None
     new_status: TicketStatus
     occurred_at: datetime
+    actor: str | None = None
+    reason: str | None = None
 
 
 @dataclass

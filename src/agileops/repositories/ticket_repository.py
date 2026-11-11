@@ -23,7 +23,14 @@ class TicketRepository(Protocol):
         """Return linked tickets in creation order, or None if the incident does not exist."""
         ...
 
-    def change_status(self, ticket_id: str, new_status: TicketStatus) -> Ticket | None:
+    def change_status(
+        self,
+        ticket_id: str,
+        new_status: TicketStatus,
+        *,
+        actor: str | None = None,
+        reason: str | None = None,
+    ) -> Ticket | None:
         """Apply a domain transition and atomically store the new status and its event."""
         ...
 

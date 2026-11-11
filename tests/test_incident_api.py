@@ -78,6 +78,10 @@ def test_incident_tickets_keep_the_ticket_contract_and_history(tmp_path):
         history = client.get("/tickets/TASK-001/events").json()
         assert [event["event_type"] for event in history] == ["created", "status_changed"]
         assert [event["new_status"] for event in history] == ["NEW", "INVESTIGATING"]
+        assert [(event["actor"], event["reason"]) for event in history] == [
+            (INCIDENT_DATA["reported_by"], "Ticket created"),
+            ("unspecified", "No reason provided"),
+        ]
 
 
 def test_upgrade_day_five_database_preserves_tickets_and_history(tmp_path, monkeypatch):
@@ -114,6 +118,7 @@ def test_upgrade_day_five_database_preserves_tickets_and_history(tmp_path, monke
         history = client.get("/tickets/TASK-001/events").json()
         assert [event["event_id"] for event in history] == [1, 2]
         assert [event["new_status"] for event in history] == ["NEW", "INVESTIGATING"]
+        assert [(event["actor"], event["reason"]) for event in history] == [(None, None), (None, None)]
 
         incident_id = client.post("/incidents", json=INCIDENT_DATA).json()["incident_id"]
         url = f"/incidents/{quote(incident_id)}/tickets"

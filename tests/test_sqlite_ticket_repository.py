@@ -91,6 +91,47 @@ def test_failed_event_write_rolls_back_status(database_path):
     assert [event.event_type for event in events] == [TicketEventType.CREATED]
 
 
+@pytest.mark.parametrize(
+    ("statement", "error"),
+    [
+        ("UPDATE ticket_events SET reason = 'Rewritten'", "append-only"),
+        ("DELETE FROM ticket_events", "append-only"),
+        (
+            """
+            INSERT OR REPLACE INTO ticket_events (
+                event_id, ticket_id, event_type, previous_status, new_status,
+                occurred_at, actor, reason
+            )
+            SELECT event_id, ticket_id, event_type, previous_status, new_status,
+                   occurred_at, actor, 'Replaced'
+            FROM ticket_events
+            """,
+            "append-only",
+        ),
+        (
+            """
+            INSERT INTO ticket_events (
+                ticket_id, event_type, previous_status, new_status, occurred_at
+            )
+            VALUES ('TASK-001', 'status_changed', 'new', 'investigating', '2026-11-11T18:00:00+00:00')
+            """,
+            "require an actor and reason",
+        ),
+    ],
+)
+def test_database_protects_ticket_event_history(database_path, statement, error):
+    repository = SQLiteTicketRepository(database_path)
+    ticket = repository.create(build_ticket)
+    history = repository.list_events(ticket.ticket_id)
+
+    with pytest.raises(sqlite3.IntegrityError, match=error):
+        with database.write_transaction(database_path) as connection:
+            connection.execute("PRAGMA recursive_triggers = OFF")
+            connection.execute(statement)
+
+    assert repository.list_events(ticket.ticket_id) == history
+
+
 def test_concurrent_creation_allocates_unique_ordered_ids(database_path):
     repositories = [SQLiteTicketRepository(database_path) for _ in range(16)]
     with ThreadPoolExecutor(max_workers=8) as executor:

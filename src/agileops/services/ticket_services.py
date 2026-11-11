@@ -20,8 +20,15 @@ class TicketService:
     def list_tickets(self) -> list[Ticket]:
         return self.repository.list_all()
 
-    def change_ticket_status(self, ticket_id: str, new_status: TicketStatus) -> Ticket | None:
-        return self.repository.change_status(ticket_id, new_status)
+    def change_ticket_status(
+        self,
+        ticket_id: str,
+        new_status: TicketStatus,
+        *,
+        actor: str | None = None,
+        reason: str | None = None,
+    ) -> Ticket | None:
+        return self.repository.change_status(ticket_id, new_status, actor=actor, reason=reason)
 
     def list_ticket_events(self, ticket_id: str) -> list[TicketEvent] | None:
         return self.repository.list_events(ticket_id)

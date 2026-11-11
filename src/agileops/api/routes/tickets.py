@@ -68,7 +68,9 @@ def change_ticket_status(
     ticket_id: str, update: TicketStatusUpdate, service: TicketServiceDependency
 ) -> TicketResponse:
     try:
-        ticket = service.change_ticket_status(ticket_id, update.status)
+        ticket = service.change_ticket_status(
+            ticket_id, update.status, actor=update.actor, reason=update.reason
+        )
     except InvalidStatusTransitionError as error:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=str(error)) from error
     if ticket is None:
