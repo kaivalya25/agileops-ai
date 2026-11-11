@@ -1,0 +1,57 @@
+services:
+  ollama:
+    image: ollama/ollama:0.40.16
+    volumes:
+      - models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 4s
+      retries: 24
+
+  model-init:
+    image: ollama/ollama:0.40.16
+    entrypoint: ["ollama"]
+    command: ["pull", "${AGILEOPS_OLLAMA_MODEL:-qwen2.5:0.5b}"]
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  knowledge-init:
+    build: .
+    image: agileops-ai:local
+    command: ["python", "-m", "agileops.knowledge", "--database", "/data/knowledge.db", "build"]
+    volumes:
+      - data:/data
+
+  api:
+    build: .
+    image: agileops-ai:local
+    ports:
+      - "127.0.0.1:${AGILEOPS_PORT:-8000}:8000"
+    volumes:
+      - data:/data
+    environment:
+      AGILEOPS_DB_PATH: /data/agileops.db
+      AGILEOPS_LAB_DB: /data/reporting.db
+      AGILEOPS_KNOWLEDGE_DB: /data/knowledge.db
+      AGILEOPS_WORKFLOW_DIR: /data/workflows
+      AGILEOPS_OLLAMA_URL: http://ollama:11434
+      AGILEOPS_OLLAMA_MODEL: ${AGILEOPS_OLLAMA_MODEL:-qwen2.5:0.5b}
+      AGILEOPS_APPROVAL_TOKEN: ${AGILEOPS_APPROVAL_TOKEN:-}
+    depends_on:
+      model-init:
+        condition: service_completed_successfully
+      knowledge-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 24
+
+volumes:
+  data:
+  models:
