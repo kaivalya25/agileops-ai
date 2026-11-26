@@ -2,9 +2,9 @@
 
 Day 10 persistence testing was implemented alongside Day 9 sprint planning. The full suite passed 26 tests, including isolated SQLite fixtures, repository integration, and transactional rollback. See [test fixtures](../tests/conftest.py) and [sprint planning tests](../tests/test_sprint_planning.py).
 
-See [milestone verification](milestone-status.md) for implementation and test evidence.
+All 85 milestones are complete and released as `v1.0.0`. The table below is the original plan. See [milestone verification](milestone-status.md) for implementation and test evidence, and the [Day 4 audit and Day 5 plan](day-5-plan.md) for the state of the project before the API work began.
 
-| Day | Milestone | What should be completed |
+| Day | Milestone | Planned scope |
 | --- | --- | --- |
 | 10 | Persistence testing | Database fixtures, isolated test database, repository integration tests, transactional test cleanup |
 | 11 | Simulated IT environment | Create a small reporting/ETL application that AgileOps will investigate and maintain |
